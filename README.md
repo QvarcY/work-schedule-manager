@@ -4,6 +4,8 @@
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D%208.1-777BB4.svg)](https://www.php.net/)
 [![MariaDB](https://img.shields.io/badge/MariaDB-compatible-003545.svg)](https://mariadb.org/)
 
+![Work Schedule Manager](docs/screenshots/work-schedule-manager-hero.png)
+
 A self-hosted work schedule management application for creating,
 publishing and managing employee shift schedules.
 

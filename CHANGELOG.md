@@ -7,6 +7,8 @@ The format is based loosely on Keep a Changelog.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-29
+
 ### Added
 
 - Fresh-install CLI installer
@@ -24,6 +26,10 @@ The format is based loosely on Keep a Changelog.
 - Schedule change history
 - User invitations
 - System status module
+- GitHub Actions CI for PHP 8.1, 8.2, 8.3, and 8.4
+- Bug report and feature request issue forms
+- Pull request template
+- Repository screenshots and public project documentation
 - AGPL-3.0-or-later licensing
 - QvarcY attribution and project notices
 - GitHub funding configuration
@@ -39,8 +45,6 @@ The format is based loosely on Keep a Changelog.
 - Environment secrets excluded from version control
 - Fresh-install protection against accidental installation over an
   existing populated database
-
-## [1.0.0] - TBD
 
 Initial public release.
 

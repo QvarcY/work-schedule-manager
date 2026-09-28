@@ -26,7 +26,7 @@ final class SystemStatusController
         view('system-status/index', [
             'title' => 'Sistēmas statuss',
             'phpVersion' => PHP_VERSION,
-            'appVersion' => (string) Env::get('APP_VERSION', '1.0.0-dev'),
+            'appVersion' => (string) Env::get('APP_VERSION', '1.0.0'),
             'installedModules' => $this->safeInstalledModules($manager),
             'checks' => $this->checks(),
         ]);

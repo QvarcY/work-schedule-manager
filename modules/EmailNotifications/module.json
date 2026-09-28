@@ -1,0 +1,23 @@
+{
+  "name": "EmailNotifications",
+  "title": "E-pasta paziņojumi",
+  "version": "1.0.0",
+  "description": "E-pasta kanāls sistēmas paziņojumiem, ar mail() konfigurāciju, testu un piegāžu žurnālu.",
+  "migrations": [
+    "migrations/001_email_notifications.sql"
+  ],
+  "navigation": [
+    {
+      "label": "E-pasta paziņojumi",
+      "path": "/email-notifications",
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "author": "QvarcY",
+  "author_url": "https://github.com/QvarcY",
+  "homepage": "https://github.com/QvarcY/work-schedule-manager",
+  "support": "https://buymeacoffee.com/craftin",
+  "license": "AGPL-3.0-or-later"
+}

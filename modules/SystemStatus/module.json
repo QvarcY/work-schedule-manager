@@ -1,0 +1,21 @@
+{
+  "name": "SystemStatus",
+  "title": "Sistēmas statuss",
+  "version": "1.0.0",
+  "description": "Admina pārskats par sistēmas versiju, moduļiem un datubāzes pamatstruktūru.",
+  "migrations": [],
+  "navigation": [
+    {
+      "label": "Sistēmas statuss",
+      "path": "/system-status",
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "author": "QvarcY",
+  "author_url": "https://github.com/QvarcY",
+  "homepage": "https://github.com/QvarcY/work-schedule-manager",
+  "support": "https://buymeacoffee.com/craftin",
+  "license": "AGPL-3.0-or-later"
+}

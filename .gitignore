@@ -1,0 +1,40 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Local source material and audit workspace
+_source/
+_staging/
+_audit/
+
+# Runtime / generated files
+storage/*
+!storage/.gitkeep
+
+# Logs
+*.log
+
+# Archives / database dumps
+*.zip
+*.tar
+*.tar.gz
+*.sql.gz
+*.dump
+
+# IDE / editor
+.vscode/
+.idea/
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# PHP / Composer, if added later
+/vendor/
+composer.phar
+
+# Test / coverage artifacts
+.coverage/
+coverage/
+.phpunit.result.cache

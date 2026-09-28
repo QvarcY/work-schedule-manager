@@ -1,0 +1,30 @@
+{
+  "name": "ScheduleAcknowledgements",
+  "title": "Grafika apliecinājumi",
+  "version": "1.1.0",
+  "description": "Darbinieks var apliecināt, ka ir iepazinies ar publicētu grafiku; admins redz apliecinājumu statusu.",
+  "migrations": [
+    "migrations/001_schedule_acknowledgements.sql"
+  ],
+  "navigation": [
+    {
+      "label": "Apliecinājumi",
+      "path": "/schedule-acknowledgements",
+      "roles": [
+        "employee"
+      ]
+    },
+    {
+      "label": "Grafiku apliecinājumi",
+      "path": "/schedule-acknowledgements/admin",
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "author": "QvarcY",
+  "author_url": "https://github.com/QvarcY",
+  "homepage": "https://github.com/QvarcY/work-schedule-manager",
+  "support": "https://buymeacoffee.com/craftin",
+  "license": "AGPL-3.0-or-later"
+}

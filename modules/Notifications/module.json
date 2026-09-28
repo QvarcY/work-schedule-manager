@@ -1,0 +1,35 @@
+{
+  "name": "Notifications",
+  "title": "Paziņojumi",
+  "version": "1.0.1",
+  "description": "Iekšējais paziņojumu centrs, lietotāju preferences, neizlasīto paziņojumu skaits un admina ziņojumi.",
+  "migrations": [
+    "migrations/001_notifications.sql"
+  ],
+  "navigation": [
+    {
+      "label": "Paziņojumi",
+      "path": "/notifications",
+      "roles": [
+        "admin",
+        "moderator",
+        "control",
+        "employee",
+        "viewer",
+        "user"
+      ]
+    },
+    {
+      "label": "Paziņojumu pārvaldība",
+      "path": "/notifications/admin",
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "author": "QvarcY",
+  "author_url": "https://github.com/QvarcY",
+  "homepage": "https://github.com/QvarcY/work-schedule-manager",
+  "support": "https://buymeacoffee.com/craftin",
+  "license": "AGPL-3.0-or-later"
+}

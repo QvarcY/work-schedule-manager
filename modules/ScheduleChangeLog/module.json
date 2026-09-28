@@ -1,0 +1,33 @@
+{
+  "name": "ScheduleChangeLog",
+  "title": "Grafika izmaiņu žurnāls",
+  "version": "1.0.5",
+  "description": "Saglabā un pārskatāmi parāda publicētu grafiku izmaiņas darbiniekiem un administratoriem.",
+  "migrations": [
+    "migrations/001_schedule_change_log.sql"
+  ],
+  "navigation": [
+    {
+      "label": "Izmaiņas",
+      "path": "/schedule-changes",
+      "roles": [
+        "employee",
+        "user",
+        "viewer",
+        "control"
+      ]
+    },
+    {
+      "label": "Izmaiņas",
+      "path": "/schedule-changes/admin",
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "author": "QvarcY",
+  "author_url": "https://github.com/QvarcY",
+  "homepage": "https://github.com/QvarcY/work-schedule-manager",
+  "support": "https://buymeacoffee.com/craftin",
+  "license": "AGPL-3.0-or-later"
+}

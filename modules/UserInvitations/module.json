@@ -1,0 +1,23 @@
+{
+  "name": "UserInvitations",
+  "title": "Ielūgumi",
+  "version": "1.0.3",
+  "description": "Drošas ielūguma saites lietotāju un darbinieku pašreģistrācijai ar admina apstiprināšanu.",
+  "migrations": [
+    "migrations/001_user_invitations.sql"
+  ],
+  "navigation": [
+    {
+      "label": "Ielūgumi",
+      "path": "/user-invitations/admin",
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "author": "QvarcY",
+  "author_url": "https://github.com/QvarcY",
+  "homepage": "https://github.com/QvarcY/work-schedule-manager",
+  "support": "https://buymeacoffee.com/craftin",
+  "license": "AGPL-3.0-or-later"
+}

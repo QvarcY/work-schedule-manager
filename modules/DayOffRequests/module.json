@@ -1,0 +1,30 @@
+{
+  "name": "DayOffRequests",
+  "title": "Brivdienu pieteikumi",
+  "version": "1.1.0",
+  "description": "Darbinieku brivo dienu pieteikumi ar admina apstiprinasanu, noraidisanu un navigacijas pieteikumu skaitu.",
+  "migrations": [
+    "migrations/001_day_off_requests.sql"
+  ],
+  "navigation": [
+    {
+      "label": "Brivdienas",
+      "path": "/day-off-requests",
+      "roles": [
+        "employee"
+      ]
+    },
+    {
+      "label": "Brivdienu pieteikumi",
+      "path": "/day-off-requests/admin",
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "author": "QvarcY",
+  "author_url": "https://github.com/QvarcY",
+  "homepage": "https://github.com/QvarcY/work-schedule-manager",
+  "support": "https://buymeacoffee.com/craftin",
+  "license": "AGPL-3.0-or-later"
+}

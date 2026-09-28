@@ -1,0 +1,30 @@
+{
+  "name": "EmployeeProfiles",
+  "title": "Darbinieku profili",
+  "version": "1.3.0",
+  "description": "Darbinieku profili, kontaktinformācijas pārvaldība, profila darbību žurnāls, grafika redzamības režīmi un piesaiste personām grafikā.",
+  "migrations": [
+    "migrations/001_employee_profiles.sql"
+  ],
+  "navigation": [
+    {
+      "label": "Mans profils",
+      "path": "/employee/profile",
+      "roles": [
+        "employee"
+      ]
+    },
+    {
+      "label": "Darbinieki",
+      "path": "/employee-profiles/admin",
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "author": "QvarcY",
+  "author_url": "https://github.com/QvarcY",
+  "homepage": "https://github.com/QvarcY/work-schedule-manager",
+  "support": "https://buymeacoffee.com/craftin",
+  "license": "AGPL-3.0-or-later"
+}

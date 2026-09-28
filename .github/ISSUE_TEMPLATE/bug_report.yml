@@ -1,0 +1,103 @@
+name: Bug report
+description: Report a reproducible problem in Work Schedule Manager.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem.
+
+        Please include enough information for the issue to be reproduced.
+
+        For security vulnerabilities, do not use this form. Follow the instructions in SECURITY.md instead.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem description
+      description: What happened, and what did you expect to happen instead?
+      placeholder: Describe the problem clearly and concisely.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest reliable sequence that reproduces the problem.
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. Enter ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Work Schedule Manager version
+      description: Version, tag, or commit SHA if known.
+      placeholder: "Example: 1.0.0 or eb6c6c9"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: php
+    attributes:
+      label: PHP version
+      options:
+        - PHP 8.1
+        - PHP 8.2
+        - PHP 8.3
+        - PHP 8.4
+        - Other / unknown
+    validations:
+      required: true
+
+  - type: input
+    id: database
+    attributes:
+      label: Database
+      description: Database product and version if known.
+      placeholder: "Example: MariaDB 11.4"
+    validations:
+      required: false
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, web server, browser, or other relevant environment details.
+      placeholder: "Example: Ubuntu 24.04, nginx, Firefox"
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or error output
+      description: Remove passwords, tokens, personal information, and other secrets before submitting.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Screenshots, related issues, or anything else that may help.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues before opening this report.
+          required: true
+        - label: I removed passwords, tokens, personal data, and other sensitive information.
+          required: true

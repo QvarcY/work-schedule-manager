@@ -53,5 +53,11 @@ jobs:
       - name: Migration parser check
         run: php tools/check-migrations.php
 
+      - name: Translation catalogue check
+        run: php tools/check-translations.php
+
+      - name: Translator runtime test
+        run: php tests/translator.php
+
       - name: Installer preflight
         run: php tools/install.php --check

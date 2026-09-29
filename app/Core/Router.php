@@ -30,7 +30,13 @@ final class Router
         $handler = $this->routes[$method][$path] ?? null;
 
         if (!$handler) {
-            throw new HttpException(404, 'Lapa nav atrasta.');
+            foreach ($this->routes as $registeredMethod => $routes) {
+                if ($registeredMethod !== $method && isset($routes[$path])) {
+                    throw new HttpException(405, t('errors.method_not_allowed'));
+                }
+            }
+
+            throw new HttpException(404, t('errors.not_found'));
         }
 
         if (is_callable($handler)) {

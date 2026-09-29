@@ -7,11 +7,11 @@
  */
 ?>
 <section class="panel">
-    <h1>Grafiki</h1>
+    <h1><?= e(t('schedules.title')) ?></h1>
     <?php if ($isAdmin): ?>
-        <p><a class="button" href="<?= e(url('/schedules/create')) ?>">Izveidot grafika sagatavi</a></p>
+        <p><a class="button" href="<?= e(url('/schedules/create')) ?>"><?= e(t('schedules.create_template')) ?></a></p>
     <?php else: ?>
-        <p class="muted">Pieejamie publicētie grafiki.</p>
+        <p class="muted"><?= e(t('schedules.published_description')) ?></p>
     <?php endif; ?>
 </section>
 
@@ -25,20 +25,20 @@ $archivedSchedules = $isAdmin
 ?>
 
 <section class="panel">
-    <h2><?= $isAdmin ? 'Aktīvie grafiki' : 'Grafiku saraksts' ?></h2>
+    <h2><?= e($isAdmin ? t('schedules.active') : t('schedules.list')) ?></h2>
     <?php if (empty($visibleSchedules)): ?>
-        <p>Nav saglabātu grafiku.</p>
+        <p><?= e(t('schedules.empty')) ?></p>
     <?php else: ?>
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th>Nosaukums</th>
-                        <th>Mēnesis</th>
+                        <th><?= e(t('schedules.fields.name')) ?></th>
+                        <th><?= e(t('schedules.fields.month')) ?></th>
                         <?php if ($isAdmin): ?>
-                            <th>Statuss</th>
+                            <th><?= e(t('schedules.fields.status')) ?></th>
                         <?php endif; ?>
-                        <th>Atjaunots</th>
+                        <th><?= e(t('schedules.fields.updated')) ?></th>
                         <th></th>
                     </tr>
                 </thead>
@@ -48,10 +48,10 @@ $archivedSchedules = $isAdmin
                             <td><?= e($schedule['schedule_name']) ?></td>
                             <td><?= e($schedule['month']) ?></td>
                             <?php if ($isAdmin): ?>
-                                <td><?= e($schedule['status']) ?></td>
+                                <td><?= e(t('schedule.status.' . $schedule['status'], [], (string) $schedule['status'])) ?></td>
                             <?php endif; ?>
                             <td><?= e($schedule['updated_at']) ?></td>
-                            <td><a href="<?= e(url('/schedules/show?id=' . $schedule['id'])) ?>">Atvērt</a></td>
+                            <td><a href="<?= e(url('/schedules/show?id=' . $schedule['id'])) ?>"><?= e(t('common.open')) ?></a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -63,14 +63,14 @@ $archivedSchedules = $isAdmin
 <?php if ($isAdmin && !empty($archivedSchedules)): ?>
     <section class="panel">
         <details class="archive-panel">
-            <summary>Arhivētie grafiki (<?= e((string) count($archivedSchedules)) ?>)</summary>
+            <summary><?= e(t('schedules.archived_count', ['count' => count($archivedSchedules)])) ?></summary>
             <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
-                            <th>Nosaukums</th>
-                            <th>Mēnesis</th>
-                            <th>Atjaunots</th>
+                            <th><?= e(t('schedules.fields.name')) ?></th>
+                            <th><?= e(t('schedules.fields.month')) ?></th>
+                            <th><?= e(t('schedules.fields.updated')) ?></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -80,7 +80,7 @@ $archivedSchedules = $isAdmin
                                 <td><?= e($schedule['schedule_name']) ?></td>
                                 <td><?= e($schedule['month']) ?></td>
                                 <td><?= e($schedule['updated_at']) ?></td>
-                                <td><a href="<?= e(url('/schedules/show?id=' . $schedule['id'])) ?>">Atvērt</a></td>
+                                <td><a href="<?= e(url('/schedules/show?id=' . $schedule['id'])) ?>"><?= e(t('common.open')) ?></a></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

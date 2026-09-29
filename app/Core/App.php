@@ -27,8 +27,13 @@ final class App
             $router->dispatch($method, $uri);
         } catch (HttpException $exception) {
             http_response_code($exception->statusCode);
+            $statusTitleKey = 'errors.status.' . $exception->statusCode . '.title';
+            $errorTitle = Translator::has($statusTitleKey)
+                ? t($statusTitleKey)
+                : t('errors.title');
             View::render('errors/http', [
-                'title' => 'Kļūda',
+                'title' => $errorTitle,
+                'errorTitle' => $errorTitle,
                 'message' => $exception->getMessage(),
                 'statusCode' => $exception->statusCode,
             ]);
@@ -36,8 +41,9 @@ final class App
             http_response_code(500);
             $debug = Env::bool('APP_DEBUG', false);
             View::render('errors/http', [
-                'title' => 'Servera kļūda',
-                'message' => $debug ? $exception->getMessage() : 'Radās neparedzēta kļūda.',
+                'title' => t('errors.status.500.title'),
+                'errorTitle' => t('errors.status.500.title'),
+                'message' => $debug ? $exception->getMessage() : t('errors.generic'),
                 'statusCode' => 500,
             ]);
         }

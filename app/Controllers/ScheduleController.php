@@ -23,12 +23,12 @@ final class ScheduleController
     public function index(): void
     {
         $user = auth()->requireLogin();
-        ActivityLogger::log('schedules_list_viewed', 'schedule', null, 'Apskatīts grafiku saraksts.', $user);
+        ActivityLogger::log('schedules_list_viewed', 'schedule', null, 'schedule list viewed', $user);
         $isAdmin = ($user['role'] ?? '') === 'admin';
         $scheduleModel = new Schedule();
 
         view('schedules/index', [
-            'title' => 'Grafiki',
+            'title' => t('schedules.title'),
             'schedules' => $isAdmin ? $scheduleModel->all() : $scheduleModel->published(),
             'isAdmin' => $isAdmin,
         ]);
@@ -42,12 +42,12 @@ final class ScheduleController
         $schedule = (new Schedule())->findWithEmployees($id);
 
         if (!$schedule) {
-            Session::flash('error', 'Grafiks nav atrasts.');
+            Session::flash('error', t('schedules.not_found'));
             redirect('/schedules');
         }
 
         if (($user['role'] ?? '') !== 'admin' && ($schedule['status'] ?? '') !== 'published') {
-            Session::flash('error', 'Šis grafiks vēl nav publicēts.');
+            Session::flash('error', t('schedules.not_published'));
             redirect('/schedules');
         }
 
@@ -76,12 +76,12 @@ final class ScheduleController
         $schedule = (new Schedule())->findWithEmployees($id);
 
         if (!$schedule) {
-            Session::flash('error', 'Grafiks nav atrasts.');
+            Session::flash('error', t('schedules.not_found'));
             redirect('/schedules');
         }
 
         view('schedules/edit', [
-            'title' => 'Labot grafiku',
+            'title' => t('schedules.edit.title'),
             'schedule' => $schedule,
             'shiftTypes' => (new ShiftType())->activeByCode(),
             'registeredEmployees' => (new User())->employees(),
@@ -93,7 +93,7 @@ final class ScheduleController
         auth()->requireAdmin();
 
         view('schedules/create', [
-            'title' => 'Jauns grafiks',
+            'title' => t('schedules.create.title'),
             'shiftTypes' => (new ShiftType())->activeByCode(),
         ]);
     }
@@ -107,13 +107,13 @@ final class ScheduleController
         $month = trim((string) ($_POST['month'] ?? ''));
 
         if ($name === '' || $month === '') {
-            Session::flash('error', 'Grafika nosaukums un mēnesis ir obligāti.');
+            Session::flash('error', t('schedules.validation.name_month_required'));
             redirect('/schedules/create');
         }
 
         $id = (new Schedule())->create($name, $month);
         ActivityLogger::log('schedule_created', 'schedule', $id, $name . ' / ' . $month);
-        Session::flash('success', 'Grafika sagatave izveidota.');
+        Session::flash('success', t('schedules.create.success'));
         redirect('/schedules/edit?id=' . $id);
     }
 
@@ -130,7 +130,7 @@ final class ScheduleController
         $daySettings = json_decode((string) ($_POST['day_settings_json'] ?? '[]'), true);
 
         if ($id <= 0 || $name === '' || $month === '' || !is_array($employees) || !is_array($daySettings)) {
-            Session::flash('error', 'Grafika dati nav korekti.');
+            Session::flash('error', t('schedules.validation.invalid_data'));
             redirect('/schedules');
         }
 
@@ -148,7 +148,7 @@ final class ScheduleController
                 $this->notifyAssignedEmployees($id, 'published');
             }
         }
-        Session::flash('success', 'Grafiks saglabāts.');
+        Session::flash('success', t('schedules.update.success'));
         redirect('/schedules/edit?id=' . $id);
     }
 
@@ -159,10 +159,10 @@ final class ScheduleController
 
         $id = (int) ($_POST['schedule_id'] ?? 0);
         (new Schedule())->setStatus($id, 'published');
-        ActivityLogger::log('schedule_published', 'schedule', $id, 'Grafiks publicēts.');
+        ActivityLogger::log('schedule_published', 'schedule', $id, 'schedule published');
         $this->notifyAssignedEmployees($id, 'published');
 
-        Session::flash('success', 'Grafiks publicēts.');
+        Session::flash('success', t('schedules.publish.success'));
         redirect('/schedules/show?id=' . $id);
     }
 
@@ -173,9 +173,9 @@ final class ScheduleController
 
         $id = (int) ($_POST['schedule_id'] ?? 0);
         (new Schedule())->delete($id);
-        ActivityLogger::log('schedule_deleted', 'schedule', $id, 'Grafiks dzēsts.');
+        ActivityLogger::log('schedule_deleted', 'schedule', $id, 'schedule deleted');
 
-        Session::flash('success', 'Grafiks dzēsts.');
+        Session::flash('success', t('schedules.delete.success'));
         redirect('/schedules');
     }
 
@@ -220,13 +220,12 @@ final class ScheduleController
                 return;
             }
 
-            $title = $event === 'updated' ? 'Grafiks atjaunināts' : 'Publicēts jauns grafiks';
-            $body = sprintf(
-                "%s: %s / %s. Atver grafiku sistēmu, lai apskatītu aktuālo informāciju.",
-                $title,
-                (string) $schedule['schedule_name'],
-                (string) $schedule['month']
-            );
+            $title = t($event === 'updated' ? 'notifications.schedule.updated_title' : 'notifications.schedule.published_title');
+            $body = t('notifications.schedule.body', [
+                'title' => $title,
+                'schedule' => (string) $schedule['schedule_name'],
+                'month' => (string) $schedule['month'],
+            ]);
 
             (new \Modules\Notifications\NotificationService())->createForUsers(
                 $title,
@@ -267,13 +266,12 @@ final class ScheduleController
                 return;
             }
 
-            $title = 'Grafiks atjaunināts';
-            $body = sprintf(
-                "%s: %s / %s. Atver grafiku sistēmu, lai apskatītu aktuālo informāciju.",
-                $title,
-                (string) ($after['schedule_name'] ?? ''),
-                (string) ($after['month'] ?? '')
-            );
+            $title = t('notifications.schedule.updated_title');
+            $body = t('notifications.schedule.body', [
+                'title' => $title,
+                'schedule' => (string) ($after['schedule_name'] ?? ''),
+                'month' => (string) ($after['month'] ?? ''),
+            ]);
 
             (new \Modules\Notifications\NotificationService())->createForUsers(
                 $title,
@@ -381,9 +379,9 @@ final class ScheduleController
         }
 
         $labels = [
-            'own' => 'Tu redzi tikai savas maiņas.',
-            'day' => 'Tu redzi tikai dienas maiņu grafiku.',
-            'night' => 'Tu redzi tikai nakts maiņu grafiku.',
+            'own' => t('schedules.view_mode.own_notice'),
+            'day' => t('schedules.view_mode.day_notice'),
+            'night' => t('schedules.view_mode.night_notice'),
         ];
 
         $filteredEmployees = [];

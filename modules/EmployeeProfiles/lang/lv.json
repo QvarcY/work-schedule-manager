@@ -1,0 +1,20 @@
+{
+  "modules.EmployeeProfiles.title": "Darbinieku profili",
+  "modules.EmployeeProfiles.description": "Darbinieku profili, kontaktinformācijas pārvaldība, profila darbību žurnāls, grafika redzamības režīmi un piesaiste personām grafikā.",
+  "modules.EmployeeProfiles.navigation.0": "Mans profils",
+  "modules.EmployeeProfiles.navigation.1": "Darbinieki",
+  "employee_profiles.profile.title": "Mans profils",
+  "employee_profiles.profile.month_hours": "Šajā mēnesī ieplānotas {hours} stundas.",
+  "employee_profiles.profile.information": "Kontaktinformācija",
+  "employee_profiles.profile.password_hint": "Atstāj tukšu, ja nevēlies mainīt paroli.",
+  "employee_profiles.profile.all_schedule_updates": "Saņemt paziņojumus par visām grafika izmaiņām",
+  "employee_profiles.profile.notification_hint": "Ja opcija nav atzīmēta, saņemsi tikai ar tevi saistītos paziņojumus.",
+  "employee_profiles.profile.save_success": "Profils saglabāts.",
+  "employee_profiles.admin.title": "Darbinieku profili",
+  "employee_profiles.admin.description": "Pārvaldi profilu piesaisti un grafika redzamību.",
+  "employee_profiles.admin.empty": "Darbinieku profili nav atrasti.",
+  "employee_profiles.admin.schedule_visibility": "Grafika redzamība",
+  "employee_profiles.admin.registered": "Reģistrēts lietotājs",
+  "employee_profiles.visibility.migration_required": "Vispirms izpildi jaunākās datubāzes migrācijas.",
+  "employee_profiles.visibility.save_success": "Grafika redzamības režīms saglabāts."
+}

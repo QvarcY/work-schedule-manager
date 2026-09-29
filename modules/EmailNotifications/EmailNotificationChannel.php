@@ -22,7 +22,7 @@ final class EmailNotificationChannel
         'from_email' => '',
         'from_name' => '',
         'reply_to' => '',
-        'subject_prefix' => '[Grafiki]',
+        'subject_prefix' => '[Work Schedule]',
     ];
 
     public function ensureSchema(): void
@@ -35,7 +35,7 @@ final class EmailNotificationChannel
                 updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         );
-        $db->exec("INSERT INTO notification_channels (code, label, active) VALUES ('email', 'E-pasts', 1) ON DUPLICATE KEY UPDATE label = VALUES(label), active = VALUES(active)");
+        $db->exec("INSERT INTO notification_channels (code, label, active) VALUES ('email', 'Email', 1) ON DUPLICATE KEY UPDATE label = VALUES(label), active = VALUES(active)");
 
         $defaults = self::DEFAULT_SETTINGS;
         $defaults['enabled'] = Env::bool('EMAIL_NOTIFICATIONS_ENABLED', false) ? '1' : '0';
@@ -101,18 +101,18 @@ final class EmailNotificationChannel
             }
 
             if (($settings['enabled'] ?? '0') !== '1') {
-                $this->recordDelivery($notificationId, $userId, 'skipped', 'E-pasta kanāls nav ieslēgts.');
+                $this->recordDelivery($notificationId, $userId, 'skipped', t('email_notifications.errors.disabled'));
                 continue;
             }
 
             if (!$this->preferenceEnabled($userId, (string) $notification['type'])) {
-                $this->recordDelivery($notificationId, $userId, 'skipped', 'Lietotājs ir atslēdzis šī tipa e-pasta paziņojumus.');
+                $this->recordDelivery($notificationId, $userId, 'skipped', t('email_notifications.errors.user_disabled'));
                 continue;
             }
 
             $email = trim((string) ($user['email'] ?? ''));
             if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $this->recordDelivery($notificationId, $userId, 'skipped', 'Lietotājam nav derīgas e-pasta adreses.');
+                $this->recordDelivery($notificationId, $userId, 'skipped', t('email_notifications.errors.user_email_missing'));
                 continue;
             }
 
@@ -127,17 +127,17 @@ final class EmailNotificationChannel
         $settings = $this->settings();
 
         if (($settings['enabled'] ?? '0') !== '1') {
-            return ['sent' => false, 'error' => 'E-pasta kanāls nav ieslēgts.'];
+            return ['sent' => false, 'error' => t('email_notifications.errors.disabled')];
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return ['sent' => false, 'error' => 'Norādīta nederīga e-pasta adrese.'];
+            return ['sent' => false, 'error' => t('email_notifications.errors.invalid_recipient')];
         }
 
         return $this->sendEmail(
             $email,
-            'Testa paziņojums',
-            "Šis ir testa e-pasts no " . $this->applicationName() . ".\n\nJa saņēmi šo ziņu, e-pasta kanāls darbojas.",
+            t('email_notifications.test.message_title'),
+            t('email_notifications.test.message_body', ['app' => $this->applicationName()]),
             $settings
         );
     }
@@ -164,7 +164,7 @@ final class EmailNotificationChannel
     {
         $fromEmail = trim((string) ($settings['from_email'] ?? ''));
         if ($fromEmail === '' || !filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
-            return ['sent' => false, 'error' => 'Nav norādīta derīga sūtītāja e-pasta adrese.'];
+            return ['sent' => false, 'error' => t('email_notifications.errors.sender_missing')];
         }
 
         $fromName = trim((string) ($settings['from_name'] ?? '')) ?: $this->applicationName();
@@ -173,7 +173,7 @@ final class EmailNotificationChannel
         $appUrl = rtrim((string) Env::get('APP_URL', ''), '/');
         $message = $body;
         if ($appUrl !== '') {
-            $message .= "\n\nAtvērt sistēmu: " . $appUrl;
+            $message .= "\n\n" . t('email_notifications.open_system', ['url' => $appUrl]);
         }
 
         $headers = [
@@ -192,7 +192,7 @@ final class EmailNotificationChannel
 
         return [
             'sent' => $sent,
-            'error' => $sent ? null : 'PHP mail() atgrieza kļūdu. Pārbaudi hostinga e-pasta konfigurāciju.',
+            'error' => $sent ? null : t('email_notifications.errors.mail_failed'),
         ];
     }
 

@@ -13,25 +13,25 @@ foreach ($roles as $role) {
 }
 
 $statusLabels = [
-    'open' => 'Aktīvs',
-    'submitted' => 'Gaida apstiprinājumu',
-    'approved' => 'Apstiprināts',
-    'rejected' => 'Noraidīts',
-    'cancelled' => 'Atcelts',
-    'expired' => 'Beidzies',
+    'open' => t('invitations.status.open'),
+    'submitted' => t('invitations.status.submitted'),
+    'approved' => t('invitations.status.approved'),
+    'rejected' => t('invitations.status.rejected'),
+    'cancelled' => t('invitations.status.cancelled'),
+    'expired' => t('invitations.status.expired'),
 ];
 ?>
 
 <section class="panel">
-    <h1>Ielūgumi</h1>
-    <p class="muted">Izveido drošu saiti, kuru var nosūtīt jaunam lietotājam. Konts tiek izveidots tikai pēc admina apstiprināšanas.</p>
+    <h1><?= e(t('invitations.admin.title')) ?></h1>
+    <p class="muted"><?= e(t('invitations.admin.description')) ?></p>
 </section>
 
 <section class="panel">
-    <h2>Jauns ielūgums</h2>
+    <h2><?= e(t('invitations.create.title')) ?></h2>
     <form method="post" action="<?= e(url('/user-invitations/admin/create')) ?>" class="invite-create-grid">
         <?= csrf_field() ?>
-        <input name="invited_contact" type="text" placeholder="E-pasts vai telefons">
+        <input name="invited_contact" type="text" placeholder="<?= e(t('invitations.fields.contact')) ?>">
         <select name="role">
             <?php foreach ($roleLabels as $code => $label): ?>
                 <option value="<?= e($code) ?>" <?= $code === 'employee' ? 'selected' : '' ?>><?= e($label) ?></option>
@@ -42,19 +42,19 @@ $statusLabels = [
                 <option value="<?= e($mode) ?>" <?= $mode === 'own' ? 'selected' : '' ?>><?= e($label) ?></option>
             <?php endforeach; ?>
         </select>
-        <input name="valid_days" type="number" min="1" max="30" value="7" aria-label="Derīgs dienas">
+        <input name="valid_days" type="number" min="1" max="30" value="7" aria-label="<?= e(t('invitations.fields.valid_days')) ?>">
         <label class="checkbox-pill">
             <input type="checkbox" name="can_be_scheduled" value="1" checked>
-            <span>Persona grafikam</span>
+            <span><?= e(t('users.fields.schedulable')) ?></span>
         </label>
-        <button class="button" type="submit">Izveidot saiti</button>
+        <button class="button" type="submit"><?= e(t('invitations.create.submit')) ?></button>
     </form>
 </section>
 
 <section class="panel">
-    <h2>Ielūgumu saraksts</h2>
+    <h2><?= e(t('invitations.list')) ?></h2>
     <?php if (empty($invitations)): ?>
-        <p>Nav izveidotu ielūgumu.</p>
+        <p><?= e(t('invitations.empty')) ?></p>
     <?php else: ?>
         <div class="invite-list">
             <?php foreach ($invitations as $invitation): ?>
@@ -74,15 +74,15 @@ $statusLabels = [
                     </div>
 
                     <div class="invite-details">
-                        <span><strong>Kontaktinformācija:</strong> <?= e($invitation['invited_contact'] ?: '-') ?></span>
-                        <span><strong>Izveidots:</strong> <?= e((string) $invitation['created_at']) ?></span>
-                        <span><strong>Derīgs līdz:</strong> <?= e((string) $invitation['expires_at']) ?></span>
+                        <span><strong><?= e(t('invitations.fields.contact')) ?>:</strong> <?= e($invitation['invited_contact'] ?: '-') ?></span>
+                        <span><strong><?= e(t('invitations.fields.created')) ?>:</strong> <?= e((string) $invitation['created_at']) ?></span>
+                        <span><strong><?= e(t('invitations.fields.expires')) ?>:</strong> <?= e((string) $invitation['expires_at']) ?></span>
                         <?php if (!empty($invitation['username'])): ?>
-                            <span><strong>Pieteicās:</strong> <?= e(trim((string) $invitation['first_name'] . ' ' . (string) $invitation['last_name'])) ?> (<?= e($invitation['username']) ?>)</span>
+                            <span><strong><?= e(t('invitations.fields.applicant')) ?>:</strong> <?= e(trim((string) $invitation['first_name'] . ' ' . (string) $invitation['last_name'])) ?> (<?= e($invitation['username']) ?>)</span>
                         <?php endif; ?>
                         <?php if ($inviteUrl !== ''): ?>
                             <label class="invite-copy-field">
-                                <span>Ielūguma saite</span>
+                                <span><?= e(t('invitations.fields.link')) ?></span>
                                 <input type="text" value="<?= e($inviteUrl) ?>" readonly onclick="this.select()">
                             </label>
                         <?php endif; ?>
@@ -104,21 +104,21 @@ $statusLabels = [
                             </select>
                             <label class="checkbox-pill">
                                 <input type="checkbox" name="can_be_scheduled" value="1" <?= (int) $invitation['can_be_scheduled'] === 1 ? 'checked' : '' ?>>
-                                <span>Persona grafikam</span>
+                                <span><?= e(t('users.fields.schedulable')) ?></span>
                             </label>
-                            <button class="button" type="submit">Apstiprināt</button>
+                            <button class="button" type="submit"><?= e(t('common.approve')) ?></button>
                         </form>
                         <form method="post" action="<?= e(url('/user-invitations/admin/reject')) ?>" class="invite-reject-form">
                             <?= csrf_field() ?>
                             <input type="hidden" name="id" value="<?= e((string) $invitation['id']) ?>">
-                            <input name="admin_note" type="text" placeholder="Komentārs noraidījumam">
-                            <button class="button danger" type="submit">Noraidīt</button>
+                            <input name="admin_note" type="text" placeholder="<?= e(t('invitations.reject.comment')) ?>">
+                            <button class="button danger" type="submit"><?= e(t('common.reject')) ?></button>
                         </form>
                     <?php elseif ($status === 'open'): ?>
-                        <form method="post" action="<?= e(url('/user-invitations/admin/cancel')) ?>" data-confirm="Atcelt šo ielūgumu?">
+                        <form method="post" action="<?= e(url('/user-invitations/admin/cancel')) ?>" data-confirm="<?= e(t('invitations.cancel.confirm')) ?>">
                             <?= csrf_field() ?>
                             <input type="hidden" name="id" value="<?= e((string) $invitation['id']) ?>">
-                            <button class="link-button" type="submit">Atcelt ielūgumu</button>
+                            <button class="link-button" type="submit"><?= e(t('invitations.cancel.submit')) ?></button>
                         </form>
                     <?php endif; ?>
                 </article>

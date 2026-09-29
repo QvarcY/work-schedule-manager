@@ -7,13 +7,13 @@
  */
 ?>
 <section class="panel">
-    <h1>Brivdienu pieteikumi</h1>
-    <p class="muted">Apskati darbinieku pieteiktas brivas dienas un pienem lemumu.</p>
+    <h1><?= e(t('day_off.admin.title')) ?></h1>
+    <p class="muted"><?= e(t('day_off.admin.description')) ?></p>
 </section>
 
 <section class="panel">
     <?php if (empty($requests)): ?>
-        <p>Nav pieteikumu.</p>
+        <p><?= e(t('day_off.empty')) ?></p>
     <?php else: ?>
         <div class="request-list">
             <?php foreach ($requests as $request): ?>
@@ -32,7 +32,7 @@
                             <span class="badge"><?= e(importance_label($request['importance'])) ?></span>
                             <span class="badge"><?= e(status_label($request['status'])) ?></span>
                             <?php if ($sameDateCount > 1): ?>
-                                <span class="badge warning"><?= $sameDateCount ?> pieteikumi saja diena</span>
+                                <span class="badge warning"><?= e(t('day_off.same_date_count', ['count' => $sameDateCount])) ?></span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -41,16 +41,16 @@
                         <p><?= e($request['comment']) ?></p>
                     <?php endif; ?>
                     <?php if (!empty($request['admin_comment'])): ?>
-                        <p class="muted">Admina komentars: <?= e($request['admin_comment']) ?></p>
+                        <p class="muted"><?= e(t('day_off.admin_comment', ['comment' => $request['admin_comment']])) ?></p>
                     <?php endif; ?>
 
                     <?php if ($request['status'] === 'pending'): ?>
                         <form class="request-decision-form" method="post" action="<?= e(url('/day-off-requests/admin/decide')) ?>">
                             <?= csrf_field() ?>
                             <input type="hidden" name="id" value="<?= e((string) $request['id']) ?>">
-                            <input name="admin_comment" type="text" placeholder="Komentars, ja nepieciesams">
-                            <button class="button secondary" name="status" value="approved" type="submit">Apstiprinat</button>
-                            <button class="button danger" name="status" value="rejected" type="submit">Noraidit</button>
+                            <input name="admin_comment" type="text" placeholder="<?= e(t('day_off.admin.comment_placeholder')) ?>">
+                            <button class="button secondary" name="status" value="approved" type="submit"><?= e(t('common.approve')) ?></button>
+                            <button class="button danger" name="status" value="rejected" type="submit"><?= e(t('common.reject')) ?></button>
                         </form>
                     <?php endif; ?>
                 </article>
@@ -63,18 +63,18 @@
 function importance_label(string $importance): string
 {
     return [
-        'velams' => 'Velams',
-        'svarigs' => 'Svarigs',
-        'neatliekams' => 'Neatliekams',
+        'velams' => t('day_off.importance.preferred'),
+        'svarigs' => t('day_off.importance.important'),
+        'neatliekams' => t('day_off.importance.urgent'),
     ][$importance] ?? $importance;
 }
 
 function status_label(string $status): string
 {
     return [
-        'pending' => 'Gaida',
-        'approved' => 'Apstiprinats',
-        'rejected' => 'Noraidits',
+        'pending' => t('day_off.status.pending'),
+        'approved' => t('day_off.status.approved'),
+        'rejected' => t('day_off.status.rejected'),
     ][$status] ?? $status;
 }
 ?>

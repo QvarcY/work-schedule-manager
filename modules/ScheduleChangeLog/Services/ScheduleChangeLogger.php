@@ -53,7 +53,7 @@ final class ScheduleChangeLogger
             );
             $batchStmt->execute([
                 $scheduleId,
-                (string) ($after['schedule_name'] ?? $before['schedule_name'] ?? 'Grafiks'),
+                (string) ($after['schedule_name'] ?? $before['schedule_name'] ?? t('schedules.default_name')),
                 (string) ($after['month'] ?? $before['month'] ?? ''),
                 $changedBy,
                 $this->summaryText($items),
@@ -167,7 +167,7 @@ final class ScheduleChangeLogger
             $userId = (int) ($employee['user_id'] ?? 0);
             $name = trim((string) ($employee['name'] ?? ''));
             if ($name === '') {
-                $name = 'Darbinieks';
+                $name = t('schedules.employee');
             }
 
             $key = $userId > 0
@@ -205,7 +205,7 @@ final class ScheduleChangeLogger
         $employeeCount = count($employeeNames);
         $changeCount = count($items);
 
-        return sprintf('%d izmaiņas, %d darbinieki', $changeCount, $employeeCount);
+        return sprintf('changes=%d, users=%d', $changeCount, $employeeCount);
     }
 
     private function moduleIsActive(): bool

@@ -7,7 +7,7 @@
  */
 ?>
 <section class="panel">
-    <h1><?= e((string) ($statusCode ?? 500)) ?></h1>
-    <p><?= e($message ?? 'Radās kļūda.') ?></p>
-    <a class="button secondary" href="<?= e(url('/')) ?>">Atpakaļ</a>
+    <h1><?= e((string) ($statusCode ?? 500)) ?> — <?= e($errorTitle ?? t('errors.title')) ?></h1>
+    <p><?= e($message ?? t('errors.fallback')) ?></p>
+    <a class="button secondary" href="<?= e(url('/')) ?>"><?= e(t('common.back')) ?></a>
 </section>

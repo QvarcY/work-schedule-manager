@@ -27,7 +27,7 @@ final class View
         }
 
         if (!is_file($viewFile)) {
-            throw new HttpException(500, 'Skata fails nav atrasts: ' . $template);
+            throw new HttpException(500, t('errors.view_unavailable'));
         }
 
         require dirname(__DIR__) . '/Views/layout.php';

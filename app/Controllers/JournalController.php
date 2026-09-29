@@ -34,7 +34,7 @@ final class JournalController
         $result = $activityLog->paginated($filters, $page, $perPage);
 
         view('journal/index', [
-            'title' => 'Žurnāls',
+            'title' => t('journal.title'),
             'logs' => $result['logs'],
             'filters' => $filters,
             'actors' => $activityLog->actors(),
@@ -53,9 +53,9 @@ final class JournalController
 
         $period = (string) ($_POST['period'] ?? '');
         $deleted = (new ActivityLog())->deleteOlderThan($period);
-        ActivityLogger::log('journal_pruned', 'activity_log', null, 'Dzēsti ieraksti: ' . $deleted . ', periods: ' . $period, $admin);
+        ActivityLogger::log('journal_pruned', 'activity_log', null, 'deleted=' . $deleted . ', period=' . $period, $admin);
 
-        Session::flash('success', 'Dzēsti žurnāla ieraksti: ' . $deleted);
+        Session::flash('success', t('journal.prune.success', ['count' => $deleted]));
         redirect('/journal');
     }
 }

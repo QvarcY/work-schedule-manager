@@ -7,39 +7,39 @@
  */
 ?>
 <section class="panel">
-    <h1>Grafiku apliecinājumi</h1>
-    <p class="muted">Izvēlies publicētu grafiku un pārbaudi, kuri reģistrētie darbinieki ir apliecinājuši iepazīšanos.</p>
+    <h1><?= e(t('acknowledgements.admin.title')) ?></h1>
+    <p class="muted"><?= e(t('acknowledgements.admin.description')) ?></p>
 </section>
 
 <section class="panel">
     <form method="get" action="<?= e(url('/schedule-acknowledgements/admin')) ?>" class="compact-form">
         <select name="schedule_id" required>
-            <option value="">Izvēlies grafiku</option>
+            <option value=""><?= e(t('acknowledgements.admin.select_schedule')) ?></option>
             <?php foreach ($schedules as $schedule): ?>
                 <option value="<?= e((string) $schedule['id']) ?>" <?= (int) $selectedScheduleId === (int) $schedule['id'] ? 'selected' : '' ?>>
                     <?= e($schedule['schedule_name']) ?> / <?= e($schedule['month']) ?>
                 </option>
             <?php endforeach; ?>
         </select>
-        <button class="button" type="submit">Skatīt</button>
+        <button class="button" type="submit"><?= e(t('common.view')) ?></button>
     </form>
 </section>
 
 <?php if ($selectedScheduleId > 0): ?>
     <section class="panel">
-        <h2>Statuss</h2>
+        <h2><?= e(t('acknowledgements.admin.status')) ?></h2>
         <?php if (empty($rows)): ?>
-            <p>Šim grafikam nav piesaistītu reģistrētu darbinieku.</p>
+            <p><?= e(t('acknowledgements.admin.empty')) ?></p>
         <?php else: ?>
             <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
-                            <th>Darbinieks</th>
-                            <th>Grafikā</th>
-                            <th>Statuss</th>
-                            <th>Apliecināts</th>
-                            <th>Komentārs</th>
+                            <th><?= e(t('schedules.employee')) ?></th>
+                            <th><?= e(t('acknowledgements.admin.schedule_name')) ?></th>
+                            <th><?= e(t('schedules.fields.status')) ?></th>
+                            <th><?= e(t('acknowledgements.admin.acknowledged')) ?></th>
+                            <th><?= e(t('common.comment')) ?></th>
                             <th>IP</th>
                         </tr>
                     </thead>
@@ -55,7 +55,7 @@
                                 <td><?= e($row['schedule_name'] ?? '') ?></td>
                                 <td>
                                     <span class="journal-action <?= $acknowledged ? 'admin' : 'user' ?>">
-                                        <?= $acknowledged ? 'Iepazinos' : 'Gaida' ?>
+                                        <?= e($acknowledged ? t('acknowledgements.status.acknowledged') : t('acknowledgements.status.waiting')) ?>
                                     </span>
                                 </td>
                                 <td><?= e($row['acknowledged_at'] ?: '-') ?></td>

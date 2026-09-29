@@ -16,6 +16,9 @@ $success = Session::pullFlash('success');
 $moduleNavigation = [];
 $currentRole = $currentUser['role'] ?? null;
 $brandName = trim((string) env_value('APP_NAME', 'Work Schedule Manager'));
+$currentLocale = current_locale();
+$availableLocales = available_locales();
+$localeReturnTo = (string) ($_SERVER['REQUEST_URI'] ?? '/');
 
 if ($brandName === '') {
     $brandName = 'Work Schedule Manager';
@@ -56,17 +59,17 @@ if ($currentUser) {
 }
 
 $mainLinks = [
-    ['label' => 'Pārskats', 'path' => '/'],
+    ['label' => t('nav.overview'), 'path' => '/'],
 ];
 
 if (isset($moduleByPath['/employee/profile'])) {
-    $mainLinks[] = ['label' => 'Profils', 'path' => '/employee/profile'];
+    $mainLinks[] = ['label' => t('nav.profile'), 'path' => '/employee/profile'];
 }
 
-$mainLinks[] = ['label' => 'Grafiki', 'path' => '/schedules'];
+$mainLinks[] = ['label' => t('nav.schedules'), 'path' => '/schedules'];
 
 $requestLinks = [];
-foreach (['/day-off-requests' => 'Brīvdienas', '/schedule-acknowledgements' => 'Apliecinājumi'] as $path => $label) {
+foreach (['/day-off-requests' => t('nav.day_off'), '/schedule-acknowledgements' => t('nav.acknowledgements')] as $path => $label) {
     if (isset($moduleByPath[$path])) {
         $requestLinks[] = ['label' => $label, 'path' => $path, 'badge' => $moduleByPath[$path]['badge'] ?? null];
     }
@@ -74,44 +77,44 @@ foreach (['/day-off-requests' => 'Brīvdienas', '/schedule-acknowledgements' => 
 
 $settingsLinks = [];
 if ($notificationsAvailable) {
-    $settingsLinks[] = ['label' => 'Paziņojumu iestatījumi', 'path' => '/notifications'];
+    $settingsLinks[] = ['label' => t('nav.notification_settings'), 'path' => '/notifications'];
 }
 
 $changeLinks = [];
 if (($currentRole ?? '') === 'admin' && isset($moduleByPath['/schedule-changes/admin'])) {
-    $changeLinks[] = ['label' => 'Izmaiņas', 'path' => '/schedule-changes/admin', 'badge' => $moduleByPath['/schedule-changes/admin']['badge'] ?? null];
+    $changeLinks[] = ['label' => t('nav.changes'), 'path' => '/schedule-changes/admin', 'badge' => $moduleByPath['/schedule-changes/admin']['badge'] ?? null];
 } elseif (isset($moduleByPath['/schedule-changes'])) {
-    $changeLinks[] = ['label' => 'Izmaiņas', 'path' => '/schedule-changes', 'badge' => $moduleByPath['/schedule-changes']['badge'] ?? null];
+    $changeLinks[] = ['label' => t('nav.changes'), 'path' => '/schedule-changes', 'badge' => $moduleByPath['/schedule-changes']['badge'] ?? null];
 }
 
 $adminScheduleLinks = [
-    ['label' => 'Jauns grafiks', 'path' => '/schedules/create'],
-    ['label' => 'Apzīmējumi', 'path' => '/shift-types'],
+    ['label' => t('nav.new_schedule'), 'path' => '/schedules/create'],
+    ['label' => t('nav.shift_types'), 'path' => '/shift-types'],
 ];
 
 $adminPeopleLinks = [
-    ['label' => 'Lietotāji', 'path' => '/users'],
+    ['label' => t('nav.users'), 'path' => '/users'],
 ];
 
-foreach (['/employee-profiles/admin' => 'Darbinieki', '/user-invitations/admin' => 'Ielūgumi'] as $path => $label) {
+foreach (['/employee-profiles/admin' => t('nav.employees'), '/user-invitations/admin' => t('nav.invitations')] as $path => $label) {
     if (isset($moduleByPath[$path])) {
         $adminPeopleLinks[] = ['label' => $label, 'path' => $path, 'badge' => $moduleByPath[$path]['badge'] ?? null];
     }
 }
 
 $adminRequestLinks = [];
-foreach (['/day-off-requests/admin' => 'Brīvdienu pieteikumi', '/schedule-acknowledgements/admin' => 'Grafiku apliecinājumi'] as $path => $label) {
+foreach (['/day-off-requests/admin' => t('nav.day_off_requests'), '/schedule-acknowledgements/admin' => t('nav.schedule_acknowledgements')] as $path => $label) {
     if (isset($moduleByPath[$path])) {
         $adminRequestLinks[] = ['label' => $label, 'path' => $path, 'badge' => $moduleByPath[$path]['badge'] ?? null];
     }
 }
 
 $adminSystemLinks = [
-    ['label' => 'Moduļu pārvaldība', 'path' => '/modules'],
-    ['label' => 'Darbību žurnāls', 'path' => '/journal'],
+    ['label' => t('nav.modules'), 'path' => '/modules'],
+    ['label' => t('nav.activity_log'), 'path' => '/journal'],
 ];
 
-foreach (['/notifications/admin' => 'Paziņojumu pārvaldība', '/system-status' => 'Sistēmas statuss'] as $path => $label) {
+foreach (['/notifications/admin' => t('nav.notifications_admin'), '/system-status' => t('nav.system_status'), '/translations' => t('nav.translations')] as $path => $label) {
     if (isset($moduleByPath[$path])) {
         $adminSystemLinks[] = ['label' => $label, 'path' => $path, 'badge' => $moduleByPath[$path]['badge'] ?? null];
     }
@@ -119,7 +122,7 @@ foreach (['/notifications/admin' => 'Paziņojumu pārvaldība', '/system-status'
 
 $knownPaths = array_fill_keys(array_merge(
     ['/employee/profile', '/day-off-requests', '/schedule-acknowledgements', '/schedule-changes'],
-    ['/employee-profiles/admin', '/user-invitations/admin', '/day-off-requests/admin', '/schedule-acknowledgements/admin', '/schedule-changes/admin', '/notifications/admin', '/system-status']
+    ['/employee-profiles/admin', '/user-invitations/admin', '/day-off-requests/admin', '/schedule-acknowledgements/admin', '/schedule-changes/admin', '/notifications/admin', '/system-status', '/translations']
 ), true);
 $extraModuleLinks = array_values(array_filter(
     $moduleNavigation,
@@ -143,9 +146,30 @@ $renderNavLink = static function (array $item): void {
     </a>
     <?php
 };
+
+$renderLocaleSwitcher = static function () use ($availableLocales, $currentLocale, $localeReturnTo): void {
+    if (count($availableLocales) < 2) {
+        return;
+    }
+    ?>
+    <form class="locale-switcher" method="post" action="<?= e(url('/locale')) ?>">
+        <?= csrf_field() ?>
+        <input type="hidden" name="return_to" value="<?= e($localeReturnTo) ?>">
+        <label class="sr-only" for="app-locale"><?= e(t('language.select')) ?></label>
+        <select id="app-locale" name="locale" aria-label="<?= e(t('language.select')) ?>">
+            <?php foreach ($availableLocales as $localeCode => $localeName): ?>
+                <option value="<?= e($localeCode) ?>" <?= $localeCode === $currentLocale ? 'selected' : '' ?>>
+                    <?= e($localeName) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <button class="button secondary" type="submit"><?= e(t('language.change')) ?></button>
+    </form>
+    <?php
+};
 ?>
 <!DOCTYPE html>
-<html lang="lv">
+<html lang="<?= e($currentLocale) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -153,7 +177,7 @@ $renderNavLink = static function (array $item): void {
     <meta name="license" content="AGPL-3.0-or-later">
     <link rel="license" href="https://www.gnu.org/licenses/agpl-3.0.html">
     <title><?= e($title ?? $brandName) ?></title>
-    <link rel="stylesheet" href="<?= e(url('/assets/css/app.css?v=20260803-1')) ?>">
+    <link rel="stylesheet" href="<?= e(url('/assets/css/app.css?v=20260929-1')) ?>">
 </head>
 <body>
     <div class="app-shell">
@@ -162,14 +186,14 @@ $renderNavLink = static function (array $item): void {
                 <span class="brand-mark">WS</span>
                 <span>
                     <strong><?= e($brandName) ?></strong>
-                    <small>Universāla darba grafiku pārvaldība</small>
+                    <small><?= e(t('brand.subtitle')) ?></small>
                 </span>
             </a>
 
             <?php if ($currentUser): ?>
                 <div class="topbar-actions">
                     <?php if ($notificationsAvailable): ?>
-                        <a class="notification-bell" href="<?= e(url('/notifications')) ?>" aria-label="Paziņojumi">
+                        <a class="notification-bell" href="<?= e(url('/notifications')) ?>" aria-label="<?= e(t('nav.notifications')) ?>">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M18 16v-5a6 6 0 0 0-12 0v5l-2 2h16l-2-2Z"></path>
                                 <path d="M9.5 20a2.5 2.5 0 0 0 5 0"></path>
@@ -179,11 +203,11 @@ $renderNavLink = static function (array $item): void {
                             <?php endif; ?>
                         </a>
                     <?php endif; ?>
-                    <button class="mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="false">Izvēlne</button>
+                    <button class="mobile-nav-toggle" type="button" data-nav-toggle aria-expanded="false"><?= e(t('nav.menu')) ?></button>
                 </div>
                 <nav class="nav" data-app-nav>
                     <div class="nav-group">
-                        <span class="nav-group-label">Galvenais</span>
+                        <span class="nav-group-label"><?= e(t('nav.main')) ?></span>
                         <?php foreach ($mainLinks as $item): ?>
                             <?php $renderNavLink($item); ?>
                         <?php endforeach; ?>
@@ -199,7 +223,7 @@ $renderNavLink = static function (array $item): void {
 
                     <?php if ($currentRole === 'admin'): ?>
                         <details class="nav-menu">
-                            <summary>Grafiki</summary>
+                            <summary><?= e(t('nav.schedules')) ?></summary>
                             <div class="nav-menu-panel">
                                 <?php foreach ($adminScheduleLinks as $item): ?>
                                     <?php $renderNavLink($item); ?>
@@ -207,7 +231,7 @@ $renderNavLink = static function (array $item): void {
                             </div>
                         </details>
                         <details class="nav-menu">
-                            <summary>Cilvēki</summary>
+                            <summary><?= e(t('nav.people')) ?></summary>
                             <div class="nav-menu-panel">
                                 <?php foreach ($adminPeopleLinks as $item): ?>
                                     <?php $renderNavLink($item); ?>
@@ -216,7 +240,7 @@ $renderNavLink = static function (array $item): void {
                         </details>
                         <?php if (!empty($adminRequestLinks)): ?>
                             <details class="nav-menu">
-                                <summary>Pieteikumi</summary>
+                                <summary><?= e(t('nav.requests')) ?></summary>
                                 <div class="nav-menu-panel">
                                     <?php foreach ($adminRequestLinks as $item): ?>
                                         <?php $renderNavLink($item); ?>
@@ -225,7 +249,7 @@ $renderNavLink = static function (array $item): void {
                             </details>
                         <?php endif; ?>
                         <details class="nav-menu">
-                            <summary>Sistēma</summary>
+                            <summary><?= e(t('nav.system')) ?></summary>
                             <div class="nav-menu-panel">
                                 <?php foreach ($adminSystemLinks as $item): ?>
                                     <?php $renderNavLink($item); ?>
@@ -236,7 +260,7 @@ $renderNavLink = static function (array $item): void {
 
                     <?php if (($currentRole ?? '') !== 'admin' && !empty($requestLinks)): ?>
                         <details class="nav-menu">
-                            <summary>Pieteikumi</summary>
+                            <summary><?= e(t('nav.requests')) ?></summary>
                             <div class="nav-menu-panel">
                                 <?php foreach ($requestLinks as $item): ?>
                                     <?php $renderNavLink($item); ?>
@@ -247,7 +271,7 @@ $renderNavLink = static function (array $item): void {
 
                     <?php if (($currentRole ?? '') !== 'admin' && !empty($settingsLinks)): ?>
                         <details class="nav-menu">
-                            <summary>Iestatījumi</summary>
+                            <summary><?= e(t('nav.settings')) ?></summary>
                             <div class="nav-menu-panel">
                                 <?php foreach ($settingsLinks as $item): ?>
                                     <?php $renderNavLink($item); ?>
@@ -258,7 +282,7 @@ $renderNavLink = static function (array $item): void {
 
                     <?php if (!empty($extraModuleLinks)): ?>
                         <details class="nav-menu">
-                            <summary>Papildiespējas</summary>
+                            <summary><?= e(t('nav.extras')) ?></summary>
                             <div class="nav-menu-panel">
                                 <?php foreach ($extraModuleLinks as $item): ?>
                                     <?php $renderNavLink($item); ?>
@@ -267,14 +291,20 @@ $renderNavLink = static function (array $item): void {
                         </details>
                     <?php endif; ?>
 
+                    <?php $renderLocaleSwitcher(); ?>
+
                     <div class="nav-user">
                         <span title="<?= e($userLabel) ?>"><?= e($userLabel) ?></span>
                         <form method="post" action="<?= e(url('/logout')) ?>">
                             <?= csrf_field() ?>
-                            <button class="link-button" type="submit">Iziet</button>
+                            <button class="link-button" type="submit"><?= e(t('nav.logout')) ?></button>
                         </form>
                     </div>
                 </nav>
+            <?php else: ?>
+                <div class="topbar-actions">
+                    <?php $renderLocaleSwitcher(); ?>
+                </div>
             <?php endif; ?>
         </header>
 
@@ -291,15 +321,15 @@ $renderNavLink = static function (array $item): void {
         <footer class="app-footer">
             <div class="footer-brand">
                 <strong><?= e($brandName) ?></strong>
-                <span>Darba grafiku plānošana, paziņojumi un piekļuves pārvaldība.</span>
+                <span><?= e(t('footer.description')) ?></span>
                 <span>© 2026 QvarcY</span>
             </div>
 
             <div class="footer-support">
-                <span>Original project by QvarcY</span>
+                <span><?= e(t('footer.original_project')) ?></span>
 
                 <a href="<?= e(url('/about')) ?>">
-                    Par sistēmu / licence
+                    <?= e(t('footer.about')) ?>
                 </a>
 
                 <a
@@ -315,7 +345,7 @@ $renderNavLink = static function (array $item): void {
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    Source code
+                    <?= e(t('footer.source_code')) ?>
                 </a>
 
                 <a
@@ -336,6 +366,29 @@ $renderNavLink = static function (array $item): void {
             </div>
         </footer>
     </div>
-    <script src="<?= e(url('/assets/js/app.js?v=20260706-2')) ?>"></script>
+    <script>
+        window.appTranslations = <?= json_encode([
+            'js.holiday_default' => t('schedules.holiday_default'),
+            'js.regular_day_off' => t('schedules.regular_day_off'),
+            'js.shift_count' => t('schedules.shift_count'),
+            'js.no_employees_filled' => t('schedules.editor.no_employees_filled'),
+            'js.edit_short' => t('common.edit_short'),
+            'js.employee_already_linked' => t('schedules.editor.employee_already_linked'),
+            'js.not_linked' => t('schedules.editor.not_linked'),
+            'js.link_employee' => t('schedules.editor.link_employee'),
+            'js.employee_name' => t('schedules.employee'),
+            'js.delete' => t('common.delete'),
+            'js.select_registered_employee' => t('schedules.editor.select_registered_employee'),
+            'js.employee_already_added' => t('schedules.editor.employee_already_added'),
+            'js.preparing_image' => t('schedules.export.preparing'),
+            'js.image_failed' => t('schedules.export.failed'),
+            'js.schedule_default' => t('schedules.default_name'),
+            'js.holidays' => t('schedules.holidays'),
+            'js.hours_summary' => t('schedules.hours_summary'),
+            'js.legend' => t('schedules.legend'),
+            'js.no_employees' => t('schedules.no_employees'),
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    </script>
+    <script src="<?= e(url('/assets/js/app.js?v=20260929-1')) ?>"></script>
 </body>
 </html>

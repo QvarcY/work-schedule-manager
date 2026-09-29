@@ -24,7 +24,7 @@ final class EmailNotificationController
         $channel = new EmailNotificationChannel();
 
         view('email-notifications/index', [
-            'title' => 'E-pasta paziņojumi',
+            'title' => t('email_notifications.title'),
             'settings' => $channel->settings(),
             'recentDeliveries' => $channel->recentDeliveries(),
         ]);
@@ -43,8 +43,8 @@ final class EmailNotificationController
             'subject_prefix' => trim((string) ($_POST['subject_prefix'] ?? '')),
         ]);
 
-        ActivityLogger::log('email_notifications_settings_updated', 'notification', null, 'E-pasta paziņojumu iestatījumi mainīti.', $admin);
-        Session::flash('success', 'E-pasta paziņojumu iestatījumi saglabāti.');
+        ActivityLogger::log('email_notifications_settings_updated', 'notification', null, 'email notification settings updated', $admin);
+        Session::flash('success', t('email_notifications.settings.success'));
         redirect('/email-notifications');
     }
 
@@ -58,9 +58,9 @@ final class EmailNotificationController
 
         if ($result['sent']) {
             ActivityLogger::log('email_notifications_test_sent', 'notification', null, $email, $admin);
-            Session::flash('success', 'Testa e-pasts nosūtīts.');
+            Session::flash('success', t('email_notifications.test.success'));
         } else {
-            Session::flash('error', 'Testa e-pastu neizdevās nosūtīt: ' . (string) $result['error']);
+            Session::flash('error', t('email_notifications.test.failed', ['error' => (string) $result['error']]));
         }
 
         redirect('/email-notifications');

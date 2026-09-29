@@ -15,6 +15,7 @@ use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\ModuleController;
 use App\Controllers\JournalController;
+use App\Controllers\LocaleController;
 use App\Controllers\ScheduleController;
 use App\Controllers\ShiftTypeController;
 use App\Controllers\UserController;
@@ -26,13 +27,10 @@ $router = new Router();
 
 $router->get('/', [DashboardController::class, 'index']);
 $router->get('/login', [AuthController::class, 'showLogin']);
-$router->get('/about', static function (): void {
-    view('auth/about', [
-        'title' => 'About',
-    ]);
-});
+$router->get('/about', [AuthController::class, 'about']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout', [AuthController::class, 'logout']);
+$router->post('/locale', [LocaleController::class, 'update']);
 
 $router->get('/schedules', [ScheduleController::class, 'index']);
 $router->get('/schedules/show', [ScheduleController::class, 'show']);

@@ -25,10 +25,10 @@ final class EmployeeProfileController
         $user = auth()->requireLogin();
         (new AccessControl())->ensureSchema();
         $user = (new User())->findById((int) $user['id']) ?: $user;
-        ActivityLogger::log('employee_profile_viewed', 'user', (int) $user['id'], 'Darbinieks apskatīja savu profilu.', $user);
+        ActivityLogger::log('employee_profile_viewed', 'user', (int) $user['id'], 'profile viewed', $user);
 
         view('employee-profiles/profile', [
-            'title' => 'Mans profils',
+            'title' => t('employee_profiles.profile.title'),
             'user' => $user,
             'hoursThisMonth' => $this->hoursThisMonth((int) $user['id']),
         ]);
@@ -48,19 +48,19 @@ final class EmployeeProfileController
         $changed = [];
 
         if ($email !== (string) ($user['email'] ?? '')) {
-            $changed[] = 'e-pasts';
+            $changed[] = 'email';
         }
 
         if ($phone !== (string) ($user['phone'] ?? '')) {
-            $changed[] = 'telefons';
+            $changed[] = 'phone';
         }
 
         if ($password !== '') {
-            $changed[] = 'parole';
+            $changed[] = 'password';
         }
 
         if ($receiveAllScheduleUpdates !== (int) ($user['receive_all_schedule_updates'] ?? 0)) {
-            $changed[] = 'grafika paziņojumu izvēle';
+            $changed[] = 'schedule_notifications';
         }
 
         $params = [$email ?: null, $phone ?: null, $receiveAllScheduleUpdates];
@@ -83,10 +83,10 @@ final class EmployeeProfileController
             'employee_profile_updated',
             'user',
             (int) $user['id'],
-            'Mainīts: ' . ($changed ? implode(', ', $changed) : 'bez izmaiņu atšķirības'),
+            'changed=' . ($changed ? implode(',', $changed) : 'none'),
             $user
         );
-        Session::flash('success', 'Profils saglabats.');
+        Session::flash('success', t('employee_profiles.profile.save_success'));
         redirect('/employee/profile');
     }
 
@@ -94,7 +94,7 @@ final class EmployeeProfileController
     {
         $admin = auth()->requireAdmin();
         (new AccessControl())->ensureSchema();
-        ActivityLogger::log('employee_list_viewed', 'user', null, 'Admins apskatīja darbinieku sarakstu.', $admin);
+        ActivityLogger::log('employee_list_viewed', 'user', null, 'employee list viewed', $admin);
 
         $viewModeSelect = $this->usersColumnExists('schedule_view_mode')
             ? 'schedule_view_mode'
@@ -108,7 +108,7 @@ final class EmployeeProfileController
             ->fetchAll();
 
         view('employee-profiles/admin', [
-            'title' => 'Darbinieki',
+            'title' => t('employee_profiles.admin.title'),
             'employees' => $users,
         ]);
     }
@@ -125,15 +125,15 @@ final class EmployeeProfileController
         }
 
         if (!$this->usersColumnExists('schedule_view_mode')) {
-            Session::flash('error', 'Vispirms jaatjaunina EmployeeProfiles modulis, lai datubazei pievienotu redzamibas lauku.');
+            Session::flash('error', t('employee_profiles.visibility.migration_required'));
             redirect('/employee-profiles/admin');
         }
 
         $stmt = Database::connection()->prepare('UPDATE users SET schedule_view_mode = ? WHERE id = ?');
         $stmt->execute([$mode, $userId]);
 
-        ActivityLogger::log('employee_schedule_visibility_updated', 'user', $userId, 'Redzamība: ' . $mode, $admin);
-        Session::flash('success', 'Grafika redzamība saglabāta.');
+        ActivityLogger::log('employee_schedule_visibility_updated', 'user', $userId, 'visibility=' . $mode, $admin);
+        Session::flash('success', t('employee_profiles.visibility.save_success'));
         redirect('/employee-profiles/admin');
     }
 

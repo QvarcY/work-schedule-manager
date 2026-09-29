@@ -16,20 +16,20 @@ $queryBase = array_filter([
 ], static fn (string $value): bool => $value !== '');
 
 $actionLabels = [
-    'login_success' => 'Pieslēgšanās',
-    'login_failed' => 'Neveiksmīga pieslēgšanās',
-    'logout' => 'Izgāja',
-    'schedule_viewed' => 'Apskatīja grafiku',
-    'schedules_list_viewed' => 'Apskatīja grafiku sarakstu',
-    'schedule_created' => 'Izveidoja grafiku',
-    'schedule_updated' => 'Laboja grafiku',
-    'schedule_published' => 'Publicēja grafiku',
-    'schedule_deleted' => 'Dzēsa grafiku',
-    'employee_profile_viewed' => 'Apskatīja profilu',
-    'employee_profile_updated' => 'Laboja profilu',
-    'day_off_requested' => 'Pieteica brīvdienu',
-    'day_off_approved' => 'Apstiprināja brīvdienu',
-    'day_off_rejected' => 'Noraidīja brīvdienu',
+    'login_success' => t('journal.actions.login_success'),
+    'login_failed' => t('journal.actions.login_failed'),
+    'logout' => t('journal.actions.logout'),
+    'schedule_viewed' => t('journal.actions.schedule_viewed'),
+    'schedules_list_viewed' => t('journal.actions.schedules_list_viewed'),
+    'schedule_created' => t('journal.actions.schedule_created'),
+    'schedule_updated' => t('journal.actions.schedule_updated'),
+    'schedule_published' => t('journal.actions.schedule_published'),
+    'schedule_deleted' => t('journal.actions.schedule_deleted'),
+    'employee_profile_viewed' => t('journal.actions.employee_profile_viewed'),
+    'employee_profile_updated' => t('journal.actions.employee_profile_updated'),
+    'day_off_requested' => t('journal.actions.day_off_requested'),
+    'day_off_approved' => t('journal.actions.day_off_approved'),
+    'day_off_rejected' => t('journal.actions.day_off_rejected'),
 ];
 
 $userActions = [
@@ -50,27 +50,27 @@ function journal_page_url(array $queryBase, int $page): string
 <section class="panel">
     <div class="page-title-row">
         <div>
-            <h1>Žurnāls</h1>
-            <p class="muted">Filtrē, pārskati un tīri sistēmas darbību vēsturi.</p>
+            <h1><?= e(t('journal.title')) ?></h1>
+            <p class="muted"><?= e(t('journal.description')) ?></p>
         </div>
     </div>
 </section>
 
 <section class="journal-stats">
     <div class="stat-card">
-        <span>Kopā</span>
+        <span><?= e(t('journal.stats.total')) ?></span>
         <strong><?= e((string) ($stats['total'] ?? 0)) ?></strong>
     </div>
     <div class="stat-card">
-        <span>Pēdējās 24h</span>
+        <span><?= e(t('journal.stats.last_day')) ?></span>
         <strong><?= e((string) ($stats['last_day'] ?? 0)) ?></strong>
     </div>
     <div class="stat-card user-accent">
-        <span>Lietotāju darbības</span>
+        <span><?= e(t('journal.stats.user_actions')) ?></span>
         <strong><?= e((string) ($stats['employee_actions'] ?? 0)) ?></strong>
     </div>
     <div class="stat-card">
-        <span>Pieslēgšanās</span>
+        <span><?= e(t('journal.stats.logins')) ?></span>
         <strong><?= e((string) ($stats['logins'] ?? 0)) ?></strong>
     </div>
 </section>
@@ -78,9 +78,9 @@ function journal_page_url(array $queryBase, int $page): string
 <section class="panel">
     <form method="get" action="<?= e(url('/journal')) ?>" class="journal-filter-grid">
         <div class="form-row">
-            <label>Lietotājs</label>
+            <label><?= e(t('journal.filters.user')) ?></label>
             <select name="actor">
-                <option value="">Visi lietotāji</option>
+                <option value=""><?= e(t('journal.filters.all_users')) ?></option>
                 <?php foreach ($actors as $actor): ?>
                     <option value="<?= e($actor['actor_name']) ?>" <?= ($filters['actor'] ?? '') === $actor['actor_name'] ? 'selected' : '' ?>>
                         <?= e($actor['actor_name']) ?> (<?= e((string) $actor['log_count']) ?>)
@@ -89,23 +89,23 @@ function journal_page_url(array $queryBase, int $page): string
             </select>
         </div>
         <div class="form-row">
-            <label>Darbības tips</label>
+            <label><?= e(t('journal.filters.action_type')) ?></label>
             <select name="action_group">
-                <?php foreach (['' => 'Visas darbības', 'user' => 'Lietotāju darbības', 'admin' => 'Admin/core darbības', 'login' => 'Pieslēgšanās'] as $value => $label): ?>
+                <?php foreach (['' => t('journal.filters.all_actions'), 'user' => t('journal.filters.user_actions'), 'admin' => t('journal.filters.admin_actions'), 'login' => t('journal.filters.logins')] as $value => $label): ?>
                     <option value="<?= e($value) ?>" <?= ($filters['action_group'] ?? '') === $value ? 'selected' : '' ?>><?= e($label) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
         <div class="form-row">
-            <label>No</label>
+            <label><?= e(t('journal.filters.from')) ?></label>
             <input type="date" name="date_from" value="<?= e($filters['date_from'] ?? '') ?>">
         </div>
         <div class="form-row">
-            <label>Līdz</label>
+            <label><?= e(t('journal.filters.to')) ?></label>
             <input type="date" name="date_to" value="<?= e($filters['date_to'] ?? '') ?>">
         </div>
         <div class="form-row">
-            <label>Ieraksti lapā</label>
+            <label><?= e(t('journal.filters.per_page')) ?></label>
             <select name="per_page">
                 <?php foreach ([25, 50, 100, 200] as $option): ?>
                     <option value="<?= $option ?>" <?= (int) $perPage === $option ? 'selected' : '' ?>><?= $option ?></option>
@@ -113,8 +113,8 @@ function journal_page_url(array $queryBase, int $page): string
             </select>
         </div>
         <div class="journal-filter-actions">
-            <button class="button" type="submit">Filtrēt</button>
-            <a class="button secondary" href="<?= e(url('/journal')) ?>">Notīrīt</a>
+            <button class="button" type="submit"><?= e(t('common.filter')) ?></button>
+            <a class="button secondary" href="<?= e(url('/journal')) ?>"><?= e(t('common.clear')) ?></a>
         </div>
     </form>
 </section>
@@ -122,33 +122,33 @@ function journal_page_url(array $queryBase, int $page): string
 <section class="panel">
     <div class="page-title-row">
         <div>
-            <h2>Ieraksti</h2>
-            <p class="muted">Atrasti <?= e((string) $total) ?> ieraksti. Lapa <?= e((string) $page) ?> no <?= e((string) $pages) ?>.</p>
+            <h2><?= e(t('journal.entries')) ?></h2>
+            <p class="muted"><?= e(t('journal.result_summary', ['total' => $total, 'page' => $page, 'pages' => $pages])) ?></p>
         </div>
-        <form method="post" action="<?= e(url('/journal/prune')) ?>" class="compact-form" data-confirm="Dzēst vecākos žurnāla ierakstus? Šo darbību nevarēs atsaukt.">
+        <form method="post" action="<?= e(url('/journal/prune')) ?>" class="compact-form" data-confirm="<?= e(t('journal.prune.confirm')) ?>">
             <?= csrf_field() ?>
             <select name="period">
-                <option value="30d">Vecāki par 30 dienām</option>
-                <option value="90d">Vecāki par 90 dienām</option>
-                <option value="180d">Vecāki par 180 dienām</option>
-                <option value="365d">Vecāki par 1 gadu</option>
+                <option value="30d"><?= e(t('journal.prune.30d')) ?></option>
+                <option value="90d"><?= e(t('journal.prune.90d')) ?></option>
+                <option value="180d"><?= e(t('journal.prune.180d')) ?></option>
+                <option value="365d"><?= e(t('journal.prune.365d')) ?></option>
             </select>
-            <button class="button danger" type="submit">Dzēst vecos</button>
+            <button class="button danger" type="submit"><?= e(t('journal.prune.submit')) ?></button>
         </form>
     </div>
 
     <?php if (empty($logs)): ?>
-        <p>Žurnālā nav ierakstu šiem filtriem.</p>
+        <p><?= e(t('journal.empty')) ?></p>
     <?php else: ?>
         <div class="table-wrap journal-table-wrap">
             <table class="journal-table">
                 <thead>
                     <tr>
-                        <th>Laiks</th>
-                        <th>Lietotājs</th>
-                        <th>Darbība</th>
-                        <th>Objekts</th>
-                        <th>Apraksts</th>
+                        <th><?= e(t('journal.table.time')) ?></th>
+                        <th><?= e(t('journal.table.user')) ?></th>
+                        <th><?= e(t('journal.table.action')) ?></th>
+                        <th><?= e(t('journal.table.object')) ?></th>
+                        <th><?= e(t('journal.table.description')) ?></th>
                         <th>IP</th>
                     </tr>
                 </thead>
@@ -173,11 +173,11 @@ function journal_page_url(array $queryBase, int $page): string
 
         <nav class="pagination">
             <?php if ($page > 1): ?>
-                <a class="button secondary" href="<?= e(journal_page_url($queryBase, $page - 1)) ?>">Iepriekšējā</a>
+                <a class="button secondary" href="<?= e(journal_page_url($queryBase, $page - 1)) ?>"><?= e(t('common.previous')) ?></a>
             <?php endif; ?>
             <span><?= e((string) $page) ?> / <?= e((string) $pages) ?></span>
             <?php if ($page < $pages): ?>
-                <a class="button secondary" href="<?= e(journal_page_url($queryBase, $page + 1)) ?>">Nākamā</a>
+                <a class="button secondary" href="<?= e(journal_page_url($queryBase, $page + 1)) ?>"><?= e(t('common.next')) ?></a>
             <?php endif; ?>
         </nav>
     <?php endif; ?>

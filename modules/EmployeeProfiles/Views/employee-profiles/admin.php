@@ -7,24 +7,24 @@
  */
 ?>
 <section class="panel">
-    <h1>Darbinieki</h1>
-    <p class="muted">Reģistrētie darbinieki, kuri var pieslēgties savam profilam. Šeit var noteikt arī grafika redzamību katram darbiniekam.</p>
+    <h1><?= e(t('employee_profiles.admin.title')) ?></h1>
+    <p class="muted"><?= e(t('employee_profiles.admin.description')) ?></p>
 </section>
 
 <section class="panel">
     <?php if (empty($employees)): ?>
-        <p>Nav reģistrētu darbinieku.</p>
+        <p><?= e(t('employee_profiles.admin.empty')) ?></p>
     <?php else: ?>
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th>Vārds</th>
-                        <th>Uzvārds</th>
-                        <th>E-pasts</th>
-                        <th>Telefons</th>
-                        <th>Grafikā redz</th>
-                        <th>Registrēts</th>
+                        <th><?= e(t('users.fields.first_name')) ?></th>
+                        <th><?= e(t('users.fields.last_name')) ?></th>
+                        <th><?= e(t('users.fields.email')) ?></th>
+                        <th><?= e(t('users.fields.phone')) ?></th>
+                        <th><?= e(t('employee_profiles.admin.schedule_visibility')) ?></th>
+                        <th><?= e(t('employee_profiles.admin.registered')) ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,17 +40,17 @@
                                     <input type="hidden" name="user_id" value="<?= e((string) $employee['id']) ?>">
                                     <select name="schedule_view_mode">
                                         <?php foreach ([
-                                            'full' => 'Pilnu grafiku',
-                                            'own' => 'Tikai savas maiņas',
-                                            'day' => 'Tikai dienas maiņas',
-                                            'night' => 'Tikai nakts maiņas',
+                                            'full' => t('users.schedule_view.full'),
+                                            'own' => t('users.schedule_view.own'),
+                                            'day' => t('users.schedule_view.day'),
+                                            'night' => t('users.schedule_view.night'),
                                         ] as $mode => $label): ?>
                                             <option value="<?= e($mode) ?>" <?= ($employee['schedule_view_mode'] ?? 'full') === $mode ? 'selected' : '' ?>>
                                                 <?= e($label) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <button class="button secondary" type="submit">Saglabāt</button>
+                                    <button class="button secondary" type="submit"><?= e(t('common.save')) ?></button>
                                 </form>
                             </td>
                             <td><?= e((string) $employee['created_at']) ?></td>

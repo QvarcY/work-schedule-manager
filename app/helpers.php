@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 use App\Core\Auth;
 use App\Core\Csrf;
+use App\Core\Translator;
 use App\Core\View;
 
 function env_value(string $key, mixed $default = null): mixed
@@ -40,6 +41,21 @@ function redirect(string $path): never
 function view(string $template, array $data = []): void
 {
     View::render($template, $data);
+}
+
+function t(string $key, array $replace = [], ?string $default = null): string
+{
+    return Translator::translate($key, $replace, $default);
+}
+
+function current_locale(): string
+{
+    return Translator::locale();
+}
+
+function available_locales(): array
+{
+    return Translator::availableLocales();
 }
 
 function csrf_field(): string

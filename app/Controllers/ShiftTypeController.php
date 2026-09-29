@@ -23,7 +23,7 @@ final class ShiftTypeController
         auth()->requireAdmin();
 
         view('shift-types/index', [
-            'title' => 'Apzīmējumi',
+            'title' => t('shift_types.title'),
             'shiftTypes' => (new ShiftType())->all(),
         ]);
     }
@@ -35,7 +35,7 @@ final class ShiftTypeController
 
         (new ShiftType())->create($_POST);
         ActivityLogger::log('shift_type_created', 'shift_type', null, (string) ($_POST['code'] ?? ''));
-        Session::flash('success', 'Apzīmējums pievienots.');
+        Session::flash('success', t('shift_types.create.success'));
         redirect('/shift-types');
     }
 
@@ -47,7 +47,7 @@ final class ShiftTypeController
         $id = (int) ($_POST['id'] ?? 0);
         (new ShiftType())->update($id, $_POST);
         ActivityLogger::log('shift_type_updated', 'shift_type', $id, (string) ($_POST['code'] ?? ''));
-        Session::flash('success', 'Apzīmējums saglabāts.');
+        Session::flash('success', t('shift_types.update.success'));
         redirect('/shift-types');
     }
 
@@ -59,10 +59,10 @@ final class ShiftTypeController
         $id = (int) ($_POST['id'] ?? 0);
         $deleted = (new ShiftType())->delete($id);
         if ($deleted) {
-            ActivityLogger::log('shift_type_deleted', 'shift_type', $id, 'Apzīmējums dzēsts.');
-            Session::flash('success', 'Apzimejums dzests.');
+            ActivityLogger::log('shift_type_deleted', 'shift_type', $id, 'shift type deleted');
+            Session::flash('success', t('shift_types.delete.success'));
         } else {
-            Session::flash('error', 'Apzimejums jau tiek izmantots grafikos, tapec to nevar dzest. Noņem atzimi "Aktivs", lai to pasleptu jauniem grafikiem.');
+            Session::flash('error', t('shift_types.delete.in_use'));
         }
         redirect('/shift-types');
     }

@@ -19,12 +19,12 @@ final class AdminTasks
     {
         $tasks = [];
 
-        $this->addIfPositive($tasks, 'Ielūgumi apstiprināšanai', '/user-invitations/admin', $this->countIfTableExists(
+        $this->addIfPositive($tasks, t('admin_tasks.invitations'), '/user-invitations/admin', $this->countIfTableExists(
             'user_invitations',
             "SELECT COUNT(*) AS count FROM user_invitations WHERE status = 'submitted'"
         ));
 
-        $this->addIfPositive($tasks, 'Brīvdienu pieteikumi', '/day-off-requests/admin', $this->countIfTableExists(
+        $this->addIfPositive($tasks, t('admin_tasks.day_off'), '/day-off-requests/admin', $this->countIfTableExists(
             'day_off_requests',
             "SELECT COUNT(*) AS count FROM day_off_requests WHERE status = 'pending'"
         ));

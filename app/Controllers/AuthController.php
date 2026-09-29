@@ -20,14 +20,14 @@ final class AuthController
     public function showLogin(): void
     {
         view('auth/login', [
-            'title' => 'Pieslēgšanās',
+            'title' => t('auth.login.title'),
         ]);
     }
 
     public function about(): void
     {
         view('auth/about', [
-            'title' => 'Par grafiku sistēmu',
+            'title' => t('about.title'),
         ]);
     }
 
@@ -39,19 +39,19 @@ final class AuthController
         $password = (string) ($_POST['password'] ?? '');
 
         if (!auth()->attempt($username, $password)) {
-            ActivityLogger::log('login_failed', 'user', null, 'Lietotājvārds: ' . $username, ['username' => $username]);
-            Session::flash('error', 'Nepareizs lietotājvārds vai parole.');
+            ActivityLogger::log('login_failed', 'user', null, 'username=' . $username, ['username' => $username]);
+            Session::flash('error', t('auth.login.failed'));
             redirect('/login');
         }
 
-        ActivityLogger::log('login_success', 'user', null, 'Lietotājs pieslēdzās.');
+        ActivityLogger::log('login_success', 'user', null, 'login successful');
         redirect('/');
     }
 
     public function logout(): void
     {
         Csrf::verify($_POST['_csrf'] ?? null);
-        ActivityLogger::log('logout', 'user', null, 'Lietotājs izgāja no sistēmas.');
+        ActivityLogger::log('logout', 'user', null, 'logout');
         auth()->logout();
         redirect('/login');
     }

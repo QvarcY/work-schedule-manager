@@ -13,33 +13,33 @@ foreach ($roles as $role) {
 }
 
 $scheduleViewOptions = [
-    'full' => 'Pilnu grafiku',
-    'own' => 'Tikai savas maiņas',
-    'day' => 'Tikai dienas maiņas',
-    'night' => 'Tikai nakts maiņas',
+    'full' => t('users.schedule_view.full'),
+    'own' => t('users.schedule_view.own'),
+    'day' => t('users.schedule_view.day'),
+    'night' => t('users.schedule_view.night'),
 ];
 ?>
 
 <section class="panel">
-    <h1>Lietotāji</h1>
-    <p class="muted">Visi konti, kas var pieslēgties sistēmai. Ar atzīmi “persona grafikam” kontu var izmantot arī grafika darbinieku sarakstā.</p>
+    <h1><?= e(t('users.title')) ?></h1>
+    <p class="muted"><?= e(t('users.description')) ?></p>
 </section>
 
 <section class="panel">
-    <h2>Jauns lietotājs</h2>
+    <h2><?= e(t('users.create.title')) ?></h2>
     <form method="post" action="<?= e(url('/users/store')) ?>" class="user-create-grid">
         <?= csrf_field() ?>
-        <input name="username" type="text" placeholder="Lietotājvārds" autocomplete="username" required>
-        <input name="password" type="password" placeholder="Parole" required>
+        <input name="username" type="text" placeholder="<?= e(t('users.fields.username')) ?>" autocomplete="username" required>
+        <input name="password" type="password" placeholder="<?= e(t('users.fields.password')) ?>" required>
         <select name="role">
             <?php foreach ($roleOptions as $code => $label): ?>
                 <option value="<?= e($code) ?>"><?= e($label) ?></option>
             <?php endforeach; ?>
         </select>
-        <input name="first_name" type="text" placeholder="Vārds">
-        <input name="last_name" type="text" placeholder="Uzvārds">
-        <input name="email" type="email" placeholder="E-pasts">
-        <input name="phone" type="text" placeholder="Telefons">
+        <input name="first_name" type="text" placeholder="<?= e(t('users.fields.first_name')) ?>">
+        <input name="last_name" type="text" placeholder="<?= e(t('users.fields.last_name')) ?>">
+        <input name="email" type="email" placeholder="<?= e(t('users.fields.email')) ?>">
+        <input name="phone" type="text" placeholder="<?= e(t('users.fields.phone')) ?>">
         <select name="schedule_view_mode">
             <?php foreach ($scheduleViewOptions as $mode => $label): ?>
                 <option value="<?= e($mode) ?>"><?= e($label) ?></option>
@@ -47,18 +47,18 @@ $scheduleViewOptions = [
         </select>
         <label class="checkbox-pill">
             <input type="checkbox" name="can_be_scheduled" value="1">
-            <span>Persona grafikam</span>
+            <span><?= e(t('users.fields.schedulable')) ?></span>
         </label>
         <label class="checkbox-pill">
             <input type="checkbox" name="show_hours_summary" value="1">
-            <span>Rādīt stundu kopsavilkumu</span>
+            <span><?= e(t('users.fields.hours_summary')) ?></span>
         </label>
-        <button class="button" type="submit">Pievienot</button>
+        <button class="button" type="submit"><?= e(t('common.add')) ?></button>
     </form>
 </section>
 
 <section class="panel">
-    <h2>Esošie lietotāji</h2>
+    <h2><?= e(t('users.existing')) ?></h2>
     <div class="user-list">
         <?php foreach ($users as $user): ?>
             <details class="user-list-item">
@@ -66,14 +66,14 @@ $scheduleViewOptions = [
                     <span>
                         <strong><?= e($user['username']) ?></strong>
                         <small>
-                            <?= e(trim((string) ($user['first_name'] ?? '') . ' ' . (string) ($user['last_name'] ?? '')) ?: 'Bez profila vārda') ?>
+                            <?= e(trim((string) ($user['first_name'] ?? '') . ' ' . (string) ($user['last_name'] ?? '')) ?: t('users.no_profile_name')) ?>
                         </small>
                     </span>
                     <span class="role-badge"><?= e($roleOptions[$user['role']] ?? $user['role']) ?></span>
                     <?php if ((int) ($user['can_be_scheduled'] ?? 0) === 1): ?>
-                        <span class="role-badge soft">Persona grafikam</span>
+                        <span class="role-badge soft"><?= e(t('users.fields.schedulable')) ?></span>
                     <?php endif; ?>
-                    <span class="button secondary user-edit-button">Labot</span>
+                    <span class="button secondary user-edit-button"><?= e(t('common.edit')) ?></span>
                 </summary>
 
                 <div class="user-edit-panel">
@@ -86,32 +86,32 @@ $scheduleViewOptions = [
                                 <option value="<?= e($code) ?>" <?= $user['role'] === $code ? 'selected' : '' ?>><?= e($label) ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <input name="first_name" type="text" value="<?= e($user['first_name'] ?? '') ?>" placeholder="Vārds">
-                        <input name="last_name" type="text" value="<?= e($user['last_name'] ?? '') ?>" placeholder="Uzvārds">
-                        <input name="email" type="email" value="<?= e($user['email'] ?? '') ?>" placeholder="E-pasts">
-                        <input name="phone" type="text" value="<?= e($user['phone'] ?? '') ?>" placeholder="Telefons">
+                        <input name="first_name" type="text" value="<?= e($user['first_name'] ?? '') ?>" placeholder="<?= e(t('users.fields.first_name')) ?>">
+                        <input name="last_name" type="text" value="<?= e($user['last_name'] ?? '') ?>" placeholder="<?= e(t('users.fields.last_name')) ?>">
+                        <input name="email" type="email" value="<?= e($user['email'] ?? '') ?>" placeholder="<?= e(t('users.fields.email')) ?>">
+                        <input name="phone" type="text" value="<?= e($user['phone'] ?? '') ?>" placeholder="<?= e(t('users.fields.phone')) ?>">
                         <select name="schedule_view_mode">
                             <?php foreach ($scheduleViewOptions as $mode => $label): ?>
                                 <option value="<?= e($mode) ?>" <?= ($user['schedule_view_mode'] ?? 'full') === $mode ? 'selected' : '' ?>><?= e($label) ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <input name="password" type="password" placeholder="Jauna parole">
+                        <input name="password" type="password" placeholder="<?= e(t('users.fields.new_password')) ?>">
                         <label class="checkbox-pill">
                             <input type="checkbox" name="can_be_scheduled" value="1" <?= (int) ($user['can_be_scheduled'] ?? 0) === 1 ? 'checked' : '' ?>>
-                            <span>Persona grafikam</span>
+                            <span><?= e(t('users.fields.schedulable')) ?></span>
                         </label>
                         <label class="checkbox-pill">
                             <input type="checkbox" name="show_hours_summary" value="1" <?= (int) ($user['show_hours_summary'] ?? 0) === 1 ? 'checked' : '' ?>>
-                            <span>Rādīt stundu kopsavilkumu</span>
+                            <span><?= e(t('users.fields.hours_summary')) ?></span>
                         </label>
                         <div class="user-edit-actions">
-                            <button class="button secondary" type="submit">Saglabāt</button>
+                            <button class="button secondary" type="submit"><?= e(t('common.save')) ?></button>
                         </div>
                     </form>
-                    <form method="post" action="<?= e(url('/users/delete')) ?>" data-confirm="Dzēst šo lietotāju?">
+                    <form method="post" action="<?= e(url('/users/delete')) ?>" data-confirm="<?= e(t('users.delete.confirm')) ?>">
                         <?= csrf_field() ?>
                         <input type="hidden" name="id" value="<?= e((string) $user['id']) ?>">
-                        <button class="link-button" type="submit">Dzēst</button>
+                        <button class="link-button" type="submit"><?= e(t('common.delete')) ?></button>
                     </form>
                 </div>
             </details>
@@ -120,8 +120,8 @@ $scheduleViewOptions = [
 </section>
 
 <section class="panel">
-    <h2>Lomas un tiesības</h2>
-    <p class="muted">Šis ir pamata tiesību slānis nākotnei. Esošās admin darbības vēl izmanto admin aizsardzību, bet šeit jau var sagatavot lomu iespējas moduļiem un nākamajiem skatiem.</p>
+    <h2><?= e(t('users.permissions.title')) ?></h2>
+    <p class="muted"><?= e(t('users.permissions.description')) ?></p>
     <div class="role-permissions-grid">
         <?php foreach ($roles as $role): ?>
             <?php $roleCode = (string) $role['code']; ?>
@@ -143,7 +143,7 @@ $scheduleViewOptions = [
                         </label>
                     <?php endforeach; ?>
                 </div>
-                <button class="button secondary" type="submit">Saglabāt tiesības</button>
+                <button class="button secondary" type="submit"><?= e(t('users.permissions.save')) ?></button>
             </form>
         <?php endforeach; ?>
     </div>

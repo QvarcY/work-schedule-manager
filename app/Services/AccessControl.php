@@ -154,14 +154,24 @@ final class AccessControl
     {
         $this->ensureSchema();
 
-        return $this->db()->query('SELECT * FROM roles ORDER BY sort_order ASC, label ASC')->fetchAll();
+        $roles = $this->db()->query('SELECT * FROM roles ORDER BY sort_order ASC, label ASC')->fetchAll();
+        foreach ($roles as &$role) {
+            $role['label'] = t('role_labels.' . $role['code'], [], (string) $role['label']);
+        }
+
+        return $roles;
     }
 
     public function permissions(): array
     {
         $this->ensureSchema();
 
-        return $this->db()->query('SELECT * FROM permissions ORDER BY label ASC')->fetchAll();
+        $permissions = $this->db()->query('SELECT * FROM permissions ORDER BY label ASC')->fetchAll();
+        foreach ($permissions as &$permission) {
+            $permission['label'] = t('permission_labels.' . $permission['code'], [], (string) $permission['label']);
+        }
+
+        return $permissions;
     }
 
     public function rolePermissionMap(): array

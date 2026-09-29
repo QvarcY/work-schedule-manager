@@ -32,7 +32,9 @@ day-off requests and invitation-based user onboarding.
 The application is designed to be self-hosted on a standard PHP and
 MySQL/MariaDB environment.
 
-The current user interface is primarily in Latvian.
+The complete bundled interface and module workflows ship with Latvian and
+English user-interface catalogues. Administrators can add installation-level
+translations without editing the application source.
 
 ## Screenshots
 
@@ -61,6 +63,9 @@ The screenshots above use local demonstration data.
 - Invitation-based account creation
 - Activity logging
 - Modular extension system
+- Latvian and English user-interface catalogues
+- Per-user language preference
+- Translation catalogue import, export and coverage overview
 - Responsive web interface
 - CLI installer for fresh deployments
 - Migration validation tooling
@@ -77,6 +82,7 @@ The screenshots above use local demonstration data.
 | ScheduleAcknowledgements | Schedule acknowledgement tracking |
 | ScheduleChangeLog | Detailed schedule change history |
 | SystemStatus | System and environment status information |
+| Translations | Translation catalogue coverage, export and import |
 | UserInvitations | Controlled invitation-based user onboarding |
 
 ## Requirements
@@ -184,6 +190,51 @@ The repository contains `.env.example` with safe example values.
 
 Never commit `.env`.
 
+The default and fallback interface languages can be configured with:
+
+```dotenv
+APP_LOCALE=lv
+APP_FALLBACK_LOCALE=lv
+```
+
+Signed-in users can select an available language from the application
+header. Their choice is saved to their account; anonymous visitors keep the
+selection for the current session.
+
+## Translations
+
+Core translations live in:
+
+```text
+lang/<locale>.json
+```
+
+Each module can provide its own catalogue in:
+
+```text
+modules/<ModuleName>/lang/<locale>.json
+```
+
+The bundled **Translations** module gives administrators a coverage overview,
+exports a complete JSON template and imports local translation overrides.
+Imported catalogues are stored in `storage/lang/` and are intentionally not
+tracked by Git.
+
+Every catalogue is a flat JSON object. Placeholders use braces, for example
+`Hello, {name}`. Missing keys fall back to `APP_FALLBACK_LOCALE`.
+
+Validate catalogue syntax, matching keys and matching placeholders with:
+
+```bash
+php tools/check-translations.php
+```
+
+Run the translation runtime smoke test with:
+
+```bash
+php tests/translator.php
+```
+
 ## Database migrations
 
 Core migrations live in:
@@ -209,6 +260,7 @@ php tools/check-migrations.php
 ```text
 app/          Core application code
 database/     Core database migrations and seed data
+lang/         Core translation catalogues
 modules/      Bundled application modules
 public/       Web document root and public assets
 storage/      Runtime/generated data

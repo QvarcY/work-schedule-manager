@@ -1,0 +1,20 @@
+{
+  "modules.SystemStatus.title": "Sistēmas statuss",
+  "modules.SystemStatus.description": "Administratora pārskats par sistēmas versiju, moduļiem un datubāzes pamatstruktūru.",
+  "modules.SystemStatus.navigation.0": "Sistēmas statuss",
+  "system_status.title": "Sistēmas statuss",
+  "system_status.description": "Pārskats par sistēmas versiju, moduļiem un datubāzes struktūru.",
+  "system_status.system": "Sistēma",
+  "system_status.modules": "Moduļi",
+  "system_status.installed_modules": "Instalētie moduļi",
+  "system_status.no_modules": "Nav instalētu moduļu.",
+  "system_status.table.name": "Nosaukums",
+  "system_status.table.version": "Versija",
+  "system_status.table.status": "Statuss",
+  "system_status.table.installed": "Instalēts",
+  "system_status.checks": "Datubāzes pārbaudes",
+  "system_status.ok": "Kārtībā",
+  "system_status.missing": "Trūkst",
+  "system_status.check.table": "Tabula: {name}",
+  "system_status.check.column": "Kolonna: {name}"
+}

@@ -25,7 +25,7 @@ final class UserController
         $access = new AccessControl();
 
         view('users/index', [
-            'title' => 'Lietotāji',
+            'title' => t('users.title'),
             'users' => (new User())->all(),
             'roles' => $access->roles(),
             'permissions' => $access->permissions(),
@@ -44,13 +44,13 @@ final class UserController
         $profile = $this->profileFromRequest();
 
         if ($username === '' || $password === '') {
-            Session::flash('error', 'Lietotājvārds un parole ir obligāti.');
+            Session::flash('error', t('users.validation.credentials_required'));
             redirect('/users');
         }
 
         (new User())->create($username, $password, $role, $profile);
         ActivityLogger::log('user_created', 'user', null, $username . ' / ' . $role);
-        Session::flash('success', 'Lietotājs pievienots.');
+        Session::flash('success', t('users.create.success'));
         redirect('/users');
     }
 
@@ -72,7 +72,7 @@ final class UserController
         );
 
         ActivityLogger::log('user_updated', 'user', $id, $username . ' / ' . $role);
-        Session::flash('success', 'Lietotājs saglabāts.');
+        Session::flash('success', t('users.update.success'));
         redirect('/users');
     }
 
@@ -83,13 +83,13 @@ final class UserController
 
         $id = (int) ($_POST['id'] ?? 0);
         if ($id === (int) $currentUser['id']) {
-            Session::flash('error', 'Nevar dzēst lietotāju, ar kuru šobrīd esi pieslēdzies.');
+            Session::flash('error', t('users.delete.current_user'));
             redirect('/users');
         }
 
         (new User())->delete($id);
-        ActivityLogger::log('user_deleted', 'user', $id, 'Lietotājs dzēsts.');
-        Session::flash('success', 'Lietotājs dzēsts.');
+        ActivityLogger::log('user_deleted', 'user', $id, 'user deleted');
+        Session::flash('success', t('users.delete.success'));
         redirect('/users');
     }
 
@@ -103,7 +103,7 @@ final class UserController
 
         (new AccessControl())->updateRolePermissions($role, array_map('strval', $permissions));
         ActivityLogger::log('role_permissions_updated', 'role', null, $role);
-        Session::flash('success', 'Lomas tiesības saglabātas.');
+        Session::flash('success', t('users.permissions.success'));
         redirect('/users');
     }
 

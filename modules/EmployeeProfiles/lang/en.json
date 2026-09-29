@@ -1,0 +1,20 @@
+{
+  "modules.EmployeeProfiles.title": "Employee profiles",
+  "modules.EmployeeProfiles.description": "Employee profiles, contact management, profile activity history, schedule visibility modes and schedule-person assignment.",
+  "modules.EmployeeProfiles.navigation.0": "My profile",
+  "modules.EmployeeProfiles.navigation.1": "Employees",
+  "employee_profiles.profile.title": "My profile",
+  "employee_profiles.profile.month_hours": "You have {hours} scheduled hours this month.",
+  "employee_profiles.profile.information": "Contact information",
+  "employee_profiles.profile.password_hint": "Leave blank if you do not want to change the password.",
+  "employee_profiles.profile.all_schedule_updates": "Receive notifications about all schedule changes",
+  "employee_profiles.profile.notification_hint": "If disabled, you will receive only notifications related to you.",
+  "employee_profiles.profile.save_success": "The profile was saved.",
+  "employee_profiles.admin.title": "Employee profiles",
+  "employee_profiles.admin.description": "Manage profile assignments and schedule visibility.",
+  "employee_profiles.admin.empty": "No employee profiles were found.",
+  "employee_profiles.admin.schedule_visibility": "Schedule visibility",
+  "employee_profiles.admin.registered": "Registered user",
+  "employee_profiles.visibility.migration_required": "Run the latest database migrations first.",
+  "employee_profiles.visibility.save_success": "The schedule visibility mode was saved."
+}

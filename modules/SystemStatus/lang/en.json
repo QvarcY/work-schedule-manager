@@ -1,0 +1,20 @@
+{
+  "modules.SystemStatus.title": "System status",
+  "modules.SystemStatus.description": "An administrator overview of the system version, modules and core database structure.",
+  "modules.SystemStatus.navigation.0": "System status",
+  "system_status.title": "System status",
+  "system_status.description": "An overview of the system version, modules and database structure.",
+  "system_status.system": "System",
+  "system_status.modules": "Modules",
+  "system_status.installed_modules": "Installed modules",
+  "system_status.no_modules": "There are no installed modules.",
+  "system_status.table.name": "Name",
+  "system_status.table.version": "Version",
+  "system_status.table.status": "Status",
+  "system_status.table.installed": "Installed",
+  "system_status.checks": "Database checks",
+  "system_status.ok": "OK",
+  "system_status.missing": "Missing",
+  "system_status.check.table": "Table: {name}",
+  "system_status.check.column": "Column: {name}"
+}

@@ -26,10 +26,10 @@ final class UserInvitationController
     {
         $admin = auth()->requireAdmin();
         $this->ensureUserColumns();
-        ActivityLogger::log('user_invitations_viewed', 'user_invitation', null, 'Admins apskatīja ielūgumus.', $admin);
+        ActivityLogger::log('user_invitations_viewed', 'user_invitation', null, 'user invitations viewed', $admin);
 
         view('user-invitations/admin', [
-            'title' => 'Ielūgumi',
+            'title' => t('invitations.admin.title'),
             'invitations' => $this->invitations(),
             'roles' => $this->roles(),
             'viewModes' => $this->viewModes(),
@@ -64,7 +64,7 @@ final class UserInvitationController
             $days,
         ]);
 
-        Session::flash('success', 'Ielūguma saite izveidota: ' . url('/invite?token=' . $token));
+        Session::flash('success', t('invitations.create.success', ['url' => url('/invite?token=' . $token)]));
         ActivityLogger::log('user_invitation_created', 'user_invitation', (int) $this->db()->lastInsertId(), $role, $admin);
         redirect('/user-invitations/admin');
     }
@@ -75,7 +75,7 @@ final class UserInvitationController
         $invitation = $this->invitationByToken($token);
 
         view('user-invitations/accept', [
-            'title' => 'Ielūgums',
+            'title' => t('invitations.accept.title'),
             'token' => $token,
             'invitation' => $invitation,
             'isAvailable' => $this->isAvailable($invitation),
@@ -85,7 +85,7 @@ final class UserInvitationController
     public function submitted(): void
     {
         view('user-invitations/submitted', [
-            'title' => 'Pieteikums nosūtīts',
+            'title' => t('invitations.submitted.title'),
         ]);
     }
 
@@ -96,7 +96,7 @@ final class UserInvitationController
         $token = trim((string) ($_POST['token'] ?? ''));
         $invitation = $this->invitationByToken($token);
         if (!$this->isAvailable($invitation)) {
-            Session::flash('error', 'Ielūguma saite nav derīga vai vairs nav aktīva.');
+            Session::flash('error', t('invitations.validation.unavailable'));
             redirect('/invite?token=' . rawurlencode($token));
         }
 
@@ -108,22 +108,22 @@ final class UserInvitationController
         $password = (string) ($_POST['password'] ?? '');
 
         if ($firstName === '' || $lastName === '' || $email === '' || $password === '') {
-            Session::flash('error', 'Vārds, uzvārds, e-pasts un parole ir obligāti.');
+            Session::flash('error', t('invitations.validation.required_fields'));
             redirect('/invite?token=' . rawurlencode($token));
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Session::flash('error', 'E-pasta adrese nav korekta.');
+            Session::flash('error', t('invitations.validation.invalid_email'));
             redirect('/invite?token=' . rawurlencode($token));
         }
 
         if ($this->passwordScore($password) < 3) {
-            Session::flash('error', 'Parole ir par vāju. Izmanto garāku paroli ar burtiem, cipariem un simboliem.');
+            Session::flash('error', t('invitations.validation.weak_password'));
             redirect('/invite?token=' . rawurlencode($token));
         }
 
         if ($this->usernameExists($username)) {
-            Session::flash('error', 'Šāds lietotājvārds jau eksistē.');
+            Session::flash('error', t('invitations.validation.username_exists'));
             redirect('/invite?token=' . rawurlencode($token));
         }
 
@@ -166,13 +166,13 @@ final class UserInvitationController
         $invitation = $this->invitationById($id);
 
         if (!$invitation || ($invitation['status'] ?? '') !== 'submitted') {
-            Session::flash('error', 'Apstiprināšanai nav derīga pieteikuma.');
+            Session::flash('error', t('invitations.validation.invalid_submission'));
             redirect('/user-invitations/admin');
         }
 
         $username = (string) ($invitation['username'] ?? '');
         if ($this->usernameExists($username)) {
-            Session::flash('error', 'Lietotājvārds jau eksistē. Noraidi šo pieteikumu un izveido jaunu ielūgumu.');
+            Session::flash('error', t('invitations.validation.username_conflict'));
             redirect('/user-invitations/admin');
         }
 
@@ -188,14 +188,14 @@ final class UserInvitationController
 
         $this->notifyUser(
             $newUserId,
-            'Konts apstiprināts',
-            'Tavs konts ir apstiprināts. Tagad vari pieslēgties ar savu e-pastu un izveidoto paroli.',
+            t('invitations.notification.approved_title'),
+            t('invitations.notification.approved_body'),
             'account',
             (int) $admin['id']
         );
 
         ActivityLogger::log('user_invitation_approved', 'user_invitation', $id, $username . ' / ' . $role, $admin);
-        Session::flash('success', 'Lietotājs apstiprināts un konts izveidots.');
+        Session::flash('success', t('invitations.approve.success'));
         redirect('/user-invitations/admin');
     }
 
@@ -214,7 +214,7 @@ final class UserInvitationController
         $stmt->execute([$note !== '' ? $note : null, (int) $admin['id'], $id]);
 
         ActivityLogger::log('user_invitation_rejected', 'user_invitation', $id, $note, $admin);
-        Session::flash('success', 'Ielūgums noraidīts.');
+        Session::flash('success', t('invitations.reject.success'));
         redirect('/user-invitations/admin');
     }
 
@@ -228,7 +228,7 @@ final class UserInvitationController
         $stmt->execute([$id]);
 
         ActivityLogger::log('user_invitation_cancelled', 'user_invitation', $id, null, $admin);
-        Session::flash('success', 'Ielūgums atcelts.');
+        Session::flash('success', t('invitations.cancel.success'));
         redirect('/user-invitations/admin');
     }
 
@@ -317,11 +317,11 @@ final class UserInvitationController
         }
 
         return [
-            ['code' => 'employee', 'label' => 'Darbinieks'],
-            ['code' => 'viewer', 'label' => 'Skatītājs'],
-            ['code' => 'control', 'label' => 'Kontrole'],
-            ['code' => 'moderator', 'label' => 'Moderators'],
-            ['code' => 'user', 'label' => 'Lietotājs'],
+            ['code' => 'employee', 'label' => t('role_labels.employee')],
+            ['code' => 'viewer', 'label' => t('role_labels.viewer')],
+            ['code' => 'control', 'label' => t('role_labels.control')],
+            ['code' => 'moderator', 'label' => t('role_labels.moderator')],
+            ['code' => 'user', 'label' => t('role_labels.user')],
         ];
     }
 
@@ -336,10 +336,10 @@ final class UserInvitationController
     private function viewModes(): array
     {
         return [
-            'full' => 'Pilnu grafiku',
-            'own' => 'Tikai savas maiņas',
-            'day' => 'Tikai dienas maiņas',
-            'night' => 'Tikai nakts maiņas',
+            'full' => t('users.schedule_view.full'),
+            'own' => t('users.schedule_view.own'),
+            'day' => t('users.schedule_view.day'),
+            'night' => t('users.schedule_view.night'),
         ];
     }
 

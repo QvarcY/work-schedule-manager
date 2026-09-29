@@ -25,7 +25,7 @@ final class DayOffRequestController
         $this->markDecisionsSeen((int) $user['id']);
 
         view('day-off-requests/index', [
-            'title' => 'Brivdienu pieteikumi',
+            'title' => t('day_off.title'),
             'requests' => $requests,
         ]);
     }
@@ -40,24 +40,24 @@ final class DayOffRequestController
         $comment = trim((string) ($_POST['comment'] ?? ''));
 
         if (!$this->isValidDate($date)) {
-            Session::flash('error', 'Izvelies korektu datumu.');
+            Session::flash('error', t('day_off.validation.invalid_date'));
             redirect('/day-off-requests');
         }
 
         if ($date < date('Y-m-d')) {
-            Session::flash('error', 'Brivdienu var pieteikt tikai sodienai vai nakotnes datumam.');
+            Session::flash('error', t('day_off.validation.past_date'));
             redirect('/day-off-requests');
         }
 
         if ($this->hasOpenRequest((int) $user['id'], $date)) {
-            Session::flash('error', 'Tev jau ir aktivs pieteikums sim datumam.');
+            Session::flash('error', t('day_off.validation.duplicate'));
             redirect('/day-off-requests');
         }
 
         $requestId = $this->createRequest((int) $user['id'], $date, $importance, $comment);
-        $this->log('day_off_requested', 'day_off_request', $requestId, 'Datums: ' . $date, $user);
+        $this->log('day_off_requested', 'day_off_request', $requestId, 'date=' . $date, $user);
 
-        Session::flash('success', 'Brivdienas pieteikums nosutits adminam.');
+        Session::flash('success', t('day_off.create.success'));
         redirect('/day-off-requests');
     }
 
@@ -67,7 +67,7 @@ final class DayOffRequestController
         $requests = $this->allRequestsForAdmin();
 
         view('day-off-requests/admin', [
-            'title' => 'Brivdienu pieteikumi',
+            'title' => t('day_off.admin.title'),
             'requests' => $requests,
             'dateCounts' => $this->dateCounts($requests),
         ]);
@@ -83,14 +83,14 @@ final class DayOffRequestController
         $comment = trim((string) ($_POST['admin_comment'] ?? ''));
 
         if ($id <= 0 || !in_array($status, ['approved', 'rejected'], true)) {
-            Session::flash('error', 'Nederigs lemums.');
+            Session::flash('error', t('day_off.validation.invalid_decision'));
             redirect('/day-off-requests/admin');
         }
 
         $this->decideRequest($id, $status, (int) $admin['id'], $comment);
         $this->log('day_off_' . $status, 'day_off_request', $id, $comment, $admin);
 
-        Session::flash('success', 'Pieteikums atjauninats.');
+        Session::flash('success', t('day_off.decision.success'));
         redirect('/day-off-requests/admin');
     }
 
@@ -99,7 +99,7 @@ final class DayOffRequestController
         $user = auth()->requireLogin();
 
         if (($user['role'] ?? '') !== 'employee') {
-            throw new HttpException(403, 'Sadala pieejama tikai darbiniekam.');
+            throw new HttpException(403, t('day_off.employee_only'));
         }
 
         return $user;

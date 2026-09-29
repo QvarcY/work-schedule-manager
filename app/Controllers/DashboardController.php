@@ -22,7 +22,7 @@ final class DashboardController
         $scheduleModel = new Schedule();
 
         view('dashboard/index', [
-            'title' => 'Pārskats',
+            'title' => t('dashboard.title'),
             'user' => $user,
             'latestSchedules' => $scheduleModel->latest(5),
             'adminTasks' => ($user['role'] ?? '') === 'admin' ? (new AdminTasks())->pending() : [],

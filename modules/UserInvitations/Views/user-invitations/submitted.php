@@ -7,8 +7,8 @@
  */
 ?>
 <section class="panel invite-accept-panel">
-    <h1>Pieteikums nosūtīts</h1>
-    <p>Reģistrācijas dati ir saņemti. Konts vēl nav aktīvs, jo adminam tas jāapstiprina.</p>
-    <p class="muted">Kad admins apstiprinās pieteikumu, varēsi pieslēgties ar savu e-pastu un izveidoto paroli.</p>
-    <a class="button secondary" href="<?= e(url('/login')) ?>">Atpakaļ uz pieslēgšanos</a>
+    <h1><?= e(t('invitations.submitted.title')) ?></h1>
+    <p><?= e(t('invitations.submitted.description')) ?></p>
+    <p class="muted"><?= e(t('invitations.submitted.hint')) ?></p>
+    <a class="button secondary" href="<?= e(url('/login')) ?>"><?= e(t('invitations.back_to_login')) ?></a>
 </section>

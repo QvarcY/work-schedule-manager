@@ -1,0 +1,21 @@
+{
+  "name": "Translations",
+  "title": "Tulkojumu pārvaldība",
+  "version": "1.0.0",
+  "description": "Valodu katalogu pārskats, eksports, imports un instalācijas līmeņa tulkojumu labojumi.",
+  "migrations": [],
+  "navigation": [
+    {
+      "label": "Tulkojumi",
+      "path": "/translations",
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "author": "QvarcY",
+  "author_url": "https://github.com/QvarcY",
+  "homepage": "https://github.com/QvarcY/work-schedule-manager",
+  "support": "https://buymeacoffee.com/craftin",
+  "license": "AGPL-3.0-or-later"
+}

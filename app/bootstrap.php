@@ -14,3 +14,4 @@ require __DIR__ . '/helpers.php';
 
 App\Core\Env::load(dirname(__DIR__) . '/.env');
 App\Core\Session::start();
+App\Core\Translator::boot();

@@ -28,7 +28,7 @@ final class Csrf
     public static function verify(?string $token): void
     {
         if (!$token || !hash_equals((string) Session::get('_csrf'), $token)) {
-            throw new HttpException(419, 'Drošības tokena pārbaude neizdevās.');
+            throw new HttpException(419, t('security.csrf_failed'));
         }
     }
 }

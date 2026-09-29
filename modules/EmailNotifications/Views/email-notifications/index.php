@@ -7,50 +7,50 @@
  */
 ?>
 <section class="panel">
-    <h1>E-pasta paziņojumi</h1>
-    <p class="muted">Šis modulis pieslēdz e-pastu esošajai paziņojumu sistēmai. Lietotāji var savās paziņojumu preferencēs izvēlēties, kurus paziņojumu tipus saņemt e-pastā.</p>
+    <h1><?= e(t('email_notifications.title')) ?></h1>
+    <p class="muted"><?= e(t('email_notifications.description')) ?></p>
 </section>
 
 <section class="panel">
-    <h2>Iestatījumi</h2>
+    <h2><?= e(t('email_notifications.settings.title')) ?></h2>
     <form method="post" action="<?= e(url('/email-notifications/settings')) ?>" class="user-create-grid">
         <?= csrf_field() ?>
         <label class="checkbox-pill">
             <input type="checkbox" name="enabled" value="1" <?= ($settings['enabled'] ?? '0') === '1' ? 'checked' : '' ?>>
-            <span>Ieslēgt e-pasta sūtīšanu</span>
+            <span><?= e(t('email_notifications.settings.enabled')) ?></span>
         </label>
-        <input name="from_email" type="email" value="<?= e($settings['from_email'] ?? '') ?>" placeholder="Sūtītāja e-pasts" required>
-        <input name="from_name" type="text" value="<?= e($settings['from_name'] ?? '') ?>" placeholder="Sūtītāja nosaukums">
-        <input name="reply_to" type="email" value="<?= e($settings['reply_to'] ?? '') ?>" placeholder="Reply-To e-pasts">
-        <input name="subject_prefix" type="text" value="<?= e($settings['subject_prefix'] ?? '') ?>" placeholder="Temata prefikss">
-        <button class="button" type="submit">Saglabāt</button>
+        <input name="from_email" type="email" value="<?= e($settings['from_email'] ?? '') ?>" placeholder="<?= e(t('email_notifications.settings.from_email')) ?>" required>
+        <input name="from_name" type="text" value="<?= e($settings['from_name'] ?? '') ?>" placeholder="<?= e(t('email_notifications.settings.from_name')) ?>">
+        <input name="reply_to" type="email" value="<?= e($settings['reply_to'] ?? '') ?>" placeholder="<?= e(t('email_notifications.settings.reply_to')) ?>">
+        <input name="subject_prefix" type="text" value="<?= e($settings['subject_prefix'] ?? '') ?>" placeholder="<?= e(t('email_notifications.settings.subject_prefix')) ?>">
+        <button class="button" type="submit"><?= e(t('common.save')) ?></button>
     </form>
 </section>
 
 <section class="panel">
-    <h2>Tests</h2>
+    <h2><?= e(t('email_notifications.test.title')) ?></h2>
     <form method="post" action="<?= e(url('/email-notifications/test')) ?>" class="compact-form">
         <?= csrf_field() ?>
-        <input name="test_email" type="email" placeholder="Saņēmēja e-pasts" required>
-        <button class="button secondary" type="submit">Nosūtīt testa e-pastu</button>
+        <input name="test_email" type="email" placeholder="<?= e(t('email_notifications.test.recipient')) ?>" required>
+        <button class="button secondary" type="submit"><?= e(t('email_notifications.test.submit')) ?></button>
     </form>
 </section>
 
 <section class="panel">
-    <h2>Pēdējās e-pasta piegādes</h2>
+    <h2><?= e(t('email_notifications.deliveries.title')) ?></h2>
     <?php if (empty($recentDeliveries)): ?>
-        <p>Vēl nav e-pasta piegāžu.</p>
+        <p><?= e(t('email_notifications.deliveries.empty')) ?></p>
     <?php else: ?>
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
-                        <th>Laiks</th>
-                        <th>Lietotājs</th>
-                        <th>E-pasts</th>
-                        <th>Paziņojums</th>
-                        <th>Statuss</th>
-                        <th>Kļūda</th>
+                        <th><?= e(t('email_notifications.deliveries.time')) ?></th>
+                        <th><?= e(t('email_notifications.deliveries.user')) ?></th>
+                        <th><?= e(t('email_notifications.deliveries.email')) ?></th>
+                        <th><?= e(t('email_notifications.deliveries.notification')) ?></th>
+                        <th><?= e(t('email_notifications.deliveries.status')) ?></th>
+                        <th><?= e(t('email_notifications.deliveries.error')) ?></th>
                     </tr>
                 </thead>
                 <tbody>

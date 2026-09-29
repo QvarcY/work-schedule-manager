@@ -14,6 +14,7 @@ namespace App\Services;
 use App\Core\Database;
 use App\Core\HttpException;
 use App\Core\Router;
+use App\Core\Translator;
 use PDO;
 
 final class ModuleManager
@@ -59,19 +60,19 @@ final class ModuleManager
     public function install(string $moduleName): void
     {
         if ($moduleName === '' || preg_match('/^[A-Za-z0-9_-]+$/', $moduleName) !== 1) {
-            throw new HttpException(422, 'Nederigs modula nosaukums.');
+            throw new HttpException(422, t('modules.errors.invalid_name'));
         }
 
         $manifestPath = $this->modulePath . '/' . $moduleName . '/module.json';
         if (!is_file($manifestPath)) {
-            throw new HttpException(404, 'Modulis nav atrasts.');
+            throw new HttpException(404, t('modules.errors.not_found'));
         }
 
         $manifest = $this->readManifest($manifestPath);
         $installed = $this->installedModules();
 
         if (isset($installed[$manifest['name']])) {
-            throw new HttpException(409, 'Modulis jau ir uzstadits.');
+            throw new HttpException(409, t('modules.errors.already_installed'));
         }
 
         $this->ensureModuleTable();
@@ -95,27 +96,27 @@ final class ModuleManager
     public function upload(array $file): string
     {
         if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-            throw new HttpException(422, 'Modula augshupielade neizdevas.');
+            throw new HttpException(422, t('modules.errors.upload_failed'));
         }
 
         if (!class_exists(\ZipArchive::class)) {
-            throw new HttpException(500, 'Serveri nav pieejams ZipArchive paplasinajums.');
+            throw new HttpException(500, t('modules.errors.zip_unavailable'));
         }
 
         $originalName = (string) ($file['name'] ?? '');
         if (!str_ends_with(strtolower($originalName), '.zip')) {
-            throw new HttpException(422, 'Modulim jabut ZIP failam.');
+            throw new HttpException(422, t('modules.errors.zip_required'));
         }
 
         $tmpRoot = $this->storagePath . '/module_upload_' . bin2hex(random_bytes(8));
         if (!is_dir($tmpRoot) && !mkdir($tmpRoot, 0755, true)) {
-            throw new HttpException(500, 'Neizdevas izveidot pagaidu mapi.');
+            throw new HttpException(500, t('modules.errors.temp_directory'));
         }
 
         $zip = new \ZipArchive();
         if ($zip->open((string) $file['tmp_name']) !== true) {
             $this->removeDirectory($tmpRoot);
-            throw new HttpException(422, 'ZIP failu neizdevas atvert.');
+            throw new HttpException(422, t('modules.errors.zip_open'));
         }
 
         for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -123,7 +124,7 @@ final class ModuleManager
             if (str_contains($entry, '..') || str_starts_with($entry, '/') || preg_match('/^[A-Za-z]:[\\\\\\/]/', $entry)) {
                 $zip->close();
                 $this->removeDirectory($tmpRoot);
-                throw new HttpException(422, 'ZIP fails satur nederigu celu.');
+                throw new HttpException(422, t('modules.errors.unsafe_path'));
             }
         }
 
@@ -136,12 +137,12 @@ final class ModuleManager
 
         if (preg_match('/^[A-Za-z0-9_-]+$/', $moduleName) !== 1) {
             $this->removeDirectory($tmpRoot);
-            throw new HttpException(422, 'Modula nosaukuma drikst but tikai burti, cipari, _ un -.');
+            throw new HttpException(422, t('modules.errors.invalid_archive_name'));
         }
 
         if (!is_dir($this->modulePath) && !mkdir($this->modulePath, 0755, true)) {
             $this->removeDirectory($tmpRoot);
-            throw new HttpException(500, 'Neizdevas izveidot modulu mapi.');
+            throw new HttpException(500, t('modules.errors.directory_create'));
         }
 
         $target = $this->modulePath . '/' . $moduleName;
@@ -151,7 +152,7 @@ final class ModuleManager
             $backup = $this->storagePath . '/module_backup_' . $moduleName . '_' . bin2hex(random_bytes(6));
             if (!rename($target, $backup)) {
                 $this->removeDirectory($tmpRoot);
-                throw new HttpException(500, 'Neizdevas sagatavot modula atjauninajumu.');
+                throw new HttpException(500, t('modules.errors.update_prepare'));
             }
         }
 
@@ -160,7 +161,7 @@ final class ModuleManager
                 rename($backup, $target);
             }
             $this->removeDirectory($tmpRoot);
-            throw new HttpException(500, 'Neizdevas parvietot moduli.');
+            throw new HttpException(500, t('modules.errors.move_failed'));
         }
 
         $this->removeDirectory($tmpRoot);
@@ -184,7 +185,7 @@ final class ModuleManager
         $this->ensureModuleTable();
 
         if ($moduleName === '' || preg_match('/^[A-Za-z0-9_-]+$/', $moduleName) !== 1) {
-            throw new HttpException(422, 'Nederigs modula nosaukums.');
+            throw new HttpException(422, t('modules.errors.invalid_name'));
         }
 
         $manifestPath = $this->modulePath . '/' . $moduleName . '/module.json';
@@ -297,8 +298,8 @@ final class ModuleManager
                 $source,
                 $manifest['name'],
             ]);
-        } catch (\Throwable $exception) {
-            throw new HttpException(500, 'Modulis augshupieladets, bet atjauninajums neizdevas: ' . $exception->getMessage());
+        } catch (\Throwable) {
+            throw new HttpException(500, t('modules.errors.update_failed'));
         }
     }
 
@@ -358,7 +359,27 @@ final class ModuleManager
         $manifest = json_decode((string) file_get_contents($path), true);
 
         if (!is_array($manifest) || empty($manifest['name'])) {
-            throw new HttpException(422, 'Modula manifests nav derigs.');
+            throw new HttpException(422, t('modules.errors.invalid_manifest'));
+        }
+
+        $translationPrefix = 'modules.' . $manifest['name'];
+        $manifest['title'] = Translator::translate(
+            $translationPrefix . '.title',
+            [],
+            (string) ($manifest['title'] ?? $manifest['name'])
+        );
+        $manifest['description'] = Translator::translate(
+            $translationPrefix . '.description',
+            [],
+            (string) ($manifest['description'] ?? '')
+        );
+
+        foreach ($manifest['navigation'] ?? [] as $index => $item) {
+            $manifest['navigation'][$index]['label'] = Translator::translate(
+                $translationPrefix . '.navigation.' . $index,
+                [],
+                (string) ($item['label'] ?? '')
+            );
         }
 
         return $manifest;
@@ -369,7 +390,7 @@ final class ModuleManager
         if (!is_file($path)) {
             throw new HttpException(
                 422,
-                'Modula migracija nav atrasta: ' . basename($path)
+                t('modules.errors.migration_missing', ['file' => basename($path)])
             );
         }
 
@@ -378,13 +399,10 @@ final class ModuleManager
                 $this->db(),
                 $path
             );
-        } catch (\Throwable $exception) {
+        } catch (\Throwable) {
             throw new HttpException(
                 500,
-                'Modula migracija neizdevas: '
-                . basename($path)
-                . ' — '
-                . $exception->getMessage()
+                t('modules.errors.migration_failed', ['file' => basename($path)])
             );
         }
     }
@@ -435,7 +453,7 @@ final class ModuleManager
         $matches = glob($root . '/*/module.json') ?: [];
         if (count($matches) !== 1) {
             $this->removeDirectory($root);
-            throw new HttpException(422, 'ZIP faila jabut vienam modulim ar module.json.');
+            throw new HttpException(422, t('modules.errors.single_manifest'));
         }
 
         return $matches[0];

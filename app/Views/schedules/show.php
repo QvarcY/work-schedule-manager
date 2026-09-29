@@ -29,13 +29,13 @@ $weekRanges = [
     <div class="page-title-row">
         <div>
             <h1><?= e($schedule['schedule_name']) ?></h1>
-            <p class="muted"><?= e($schedule['month']) ?> · <?= e($schedule['status']) ?></p>
+            <p class="muted"><?= e($schedule['month']) ?> · <?= e(t('schedule.status.' . $schedule['status'], [], (string) $schedule['status'])) ?></p>
         </div>
         <div class="toolbar no-print">
-            <button class="button secondary" type="button" onclick="window.print()">Drukat / PDF</button>
-            <button class="button secondary" type="button" data-schedule-image-export>Saglabāt attēlu</button>
+            <button class="button secondary" type="button" onclick="window.print()"><?= e(t('schedules.print')) ?></button>
+            <button class="button secondary" type="button" data-schedule-image-export><?= e(t('schedules.save_image')) ?></button>
             <?php if ($isAdmin): ?>
-                <a class="button secondary" href="<?= e(url('/schedules/edit?id=' . $schedule['id'])) ?>">Labot</a>
+                <a class="button secondary" href="<?= e(url('/schedules/edit?id=' . $schedule['id'])) ?>"><?= e(t('common.edit')) ?></a>
             <?php endif; ?>
         </div>
     </div>
@@ -54,14 +54,14 @@ $weekRanges = [
                 <?= $range[0] ?>-<?= $range[1] ?>
             </button>
         <?php endforeach; ?>
-        <button class="week-tab" type="button" data-week="full">Pilns</button>
+        <button class="week-tab" type="button" data-week="full"><?= e(t('schedules.full_view')) ?></button>
     </div>
 
     <div class="schedule-fit-wrap">
         <table class="schedule-grid full-month-view" data-full-month-table>
             <thead>
                 <tr>
-                    <th class="employee-col">Darbinieks</th>
+                    <th class="employee-col"><?= e(t('schedules.employee')) ?></th>
                     <?php for ($day = 1; $day <= 31; $day++): ?>
                         <?php
                             $setting = $daySettings[$day] ?? null;
@@ -85,7 +85,7 @@ $weekRanges = [
             <tbody>
                 <?php if (empty($schedule['employees'])): ?>
                     <tr>
-                        <td class="employee-col" colspan="32">Sim grafikam vel nav darbinieku.</td>
+                        <td class="employee-col" colspan="32"><?= e(t('schedules.no_employees')) ?></td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($schedule['employees'] as $employee): ?>
@@ -136,7 +136,7 @@ $weekRanges = [
                 <table class="schedule-grid mobile-week-table">
                     <thead>
                         <tr>
-                            <th class="employee-col">Darbinieks</th>
+                            <th class="employee-col"><?= e(t('schedules.employee')) ?></th>
                             <?php for ($day = $range[0]; $day <= $range[1]; $day++): ?>
                                 <?php
                                     $setting = $daySettings[$day] ?? null;
@@ -204,15 +204,15 @@ $weekRanges = [
 
 <?php if (!empty($holidays)): ?>
     <section class="panel">
-        <h2>Svetku dienas</h2>
+        <h2><?= e(t('schedules.holidays')) ?></h2>
         <div class="holiday-list">
             <?php foreach ($holidays as $day => $holiday): ?>
                 <div class="holiday-item">
                     <span class="holiday-color-dot" style="background: <?= e($holiday['background_color'] ?: '#fde68a') ?>;"></span>
                     <strong><?= e((string) $day) ?>.</strong>
-                    <span><?= e($holiday['label'] ?: 'Svetku diena') ?></span>
+                    <span><?= e($holiday['label'] ?: t('schedules.holiday_default')) ?></span>
                     <?php if ($isAdmin): ?>
-                        <a class="link-button no-print" href="<?= e(url('/schedules/edit?id=' . $schedule['id'])) ?>">L</a>
+                        <a class="link-button no-print" href="<?= e(url('/schedules/edit?id=' . $schedule['id'])) ?>"><?= e(t('common.edit_short')) ?></a>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
@@ -222,15 +222,15 @@ $weekRanges = [
 
 <?php if ($canViewHoursSummary): ?>
     <section class="panel">
-        <h2>Stundu kopsavilkums</h2>
+        <h2><?= e(t('schedules.hours_summary')) ?></h2>
         <?php if (empty($schedule['employees'])): ?>
-            <p>Nav darbinieku.</p>
+            <p><?= e(t('schedules.no_employees_short')) ?></p>
         <?php else: ?>
             <div class="summary-grid">
                 <?php foreach ($schedule['employees'] as $employee): ?>
                     <div class="summary-chip">
                         <strong><?= e($employee['name']) ?></strong>
-                        <span><?= e((string) $employee['shifts_count']) ?> mainas</span>
+                        <span><?= e(t('schedules.shift_count', ['count' => $employee['shifts_count']])) ?></span>
                         <span><?= e((string) $employee['hours']) ?> h</span>
                     </div>
                 <?php endforeach; ?>
@@ -240,7 +240,7 @@ $weekRanges = [
 <?php endif; ?>
 
 <section class="panel schedule-legend-panel">
-    <h2>Legenda</h2>
+    <h2><?= e(t('schedules.legend')) ?></h2>
     <div class="legend-grid">
         <?php foreach ($shiftTypes as $type): ?>
             <div class="legend-item">

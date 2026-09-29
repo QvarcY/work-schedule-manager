@@ -24,7 +24,7 @@ final class ScheduleAcknowledgementController
         $user = $this->requireEmployee();
 
         view('schedule-acknowledgements/index', [
-            'title' => 'Grafika apliecinajumi',
+            'title' => t('acknowledgements.title'),
             'items' => $this->employeeSchedules((int) $user['id']),
         ]);
     }
@@ -38,7 +38,7 @@ final class ScheduleAcknowledgementController
         $comment = trim((string) ($_POST['comment'] ?? ''));
 
         if ($scheduleId <= 0 || !$this->isAssignedToSchedule((int) $user['id'], $scheduleId)) {
-            throw new HttpException(403, 'Sada grafika apliecinasana nav pieejama.');
+            throw new HttpException(403, t('acknowledgements.forbidden'));
         }
 
         $stmt = Database::connection()->prepare(
@@ -58,8 +58,8 @@ final class ScheduleAcknowledgementController
             substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
         ]);
 
-        ActivityLogger::log('schedule_acknowledged', 'schedule', $scheduleId, 'Darbinieks apliecinaja, ka iepazinas ar grafiku.', $user);
-        Session::flash('success', 'Apliecinajums saglabats.');
+        ActivityLogger::log('schedule_acknowledged', 'schedule', $scheduleId, 'schedule acknowledged', $user);
+        Session::flash('success', t('acknowledgements.save_success'));
         redirect('/schedule-acknowledgements');
     }
 
@@ -69,13 +69,13 @@ final class ScheduleAcknowledgementController
         $scheduleId = (int) ($_GET['schedule_id'] ?? 0);
 
         view('schedule-acknowledgements/admin', [
-            'title' => 'Grafiku apliecinajumi',
+            'title' => t('acknowledgements.admin.title'),
             'schedules' => $this->publishedSchedules(),
             'selectedScheduleId' => $scheduleId,
             'rows' => $scheduleId > 0 ? $this->adminRows($scheduleId) : [],
         ]);
 
-        ActivityLogger::log('schedule_acknowledgements_viewed', 'schedule', $scheduleId ?: null, 'Admins apskatija grafiku apliecinajumus.', $admin);
+        ActivityLogger::log('schedule_acknowledgements_viewed', 'schedule', $scheduleId ?: null, 'schedule acknowledgements viewed', $admin);
     }
 
     private function requireEmployee(): array
@@ -83,7 +83,7 @@ final class ScheduleAcknowledgementController
         $user = auth()->requireLogin();
 
         if (($user['role'] ?? '') !== 'employee' && (int) ($user['can_be_scheduled'] ?? 0) !== 1) {
-            throw new HttpException(403, 'Sadala pieejama tikai darbiniekam.');
+            throw new HttpException(403, t('acknowledgements.employee_only'));
         }
 
         return $user;

@@ -20,15 +20,6 @@ use PDO;
 
 final class NotificationController
 {
-    private const TYPES = [
-        'info' => 'Info',
-        'success' => 'Jaunums',
-        'warning' => 'Svarīgi',
-        'security' => 'Drošība',
-        'schedule' => 'Grafiks',
-        'account' => 'Konts',
-    ];
-
     public function index(): void
     {
         $user = auth()->requireLogin();
@@ -36,11 +27,11 @@ final class NotificationController
         $service->ensureSchema();
 
         view('notifications/index', [
-            'title' => 'Paziņojumi',
+            'title' => t('notifications.title'),
             'notifications' => $this->notificationsForUser((int) $user['id']),
             'preferences' => $this->preferencesForUser((int) $user['id']),
             'channels' => $this->channels(),
-            'types' => self::TYPES,
+            'types' => $this->types(),
         ]);
     }
 
@@ -80,13 +71,13 @@ final class NotificationController
         );
 
         foreach ($this->channels() as $channel) {
-            foreach (array_keys(self::TYPES) as $type) {
+            foreach (array_keys($this->types()) as $type) {
                 $isEnabled = isset($enabled[$channel['code']][$type]) ? 1 : 0;
                 $stmt->execute([(int) $user['id'], $channel['code'], $type, $isEnabled]);
             }
         }
 
-        Session::flash('success', 'Paziņojumu iestatījumi saglabāti.');
+        Session::flash('success', t('notifications.preferences.success'));
         redirect('/notifications');
     }
 
@@ -96,10 +87,10 @@ final class NotificationController
         (new NotificationService())->ensureSchema();
 
         view('notifications/admin', [
-            'title' => 'Paziņojumu pārvaldība',
+            'title' => t('notifications.admin.title'),
             'roles' => $this->roles(),
             'users' => $this->users(),
-            'types' => self::TYPES,
+            'types' => $this->types(),
             'recent' => $this->recentNotifications(),
         ]);
     }
@@ -115,7 +106,7 @@ final class NotificationController
         $target = (string) ($_POST['target'] ?? 'all');
 
         if ($title === '' || $body === '') {
-            Session::flash('error', 'Virsraksts un teksts ir obligāti.');
+            Session::flash('error', t('notifications.validation.title_body_required'));
             redirect('/notifications/admin');
         }
 
@@ -129,7 +120,7 @@ final class NotificationController
         }
 
         ActivityLogger::log('notification_sent', 'notification', null, $title . ' / ' . $target, $admin);
-        Session::flash('success', 'Paziņojums nosūtīts.');
+        Session::flash('success', t('notifications.send.success'));
         redirect('/notifications/admin');
     }
 
@@ -163,18 +154,28 @@ final class NotificationController
 
     private function channels(): array
     {
-        return $this->db()->query('SELECT * FROM notification_channels WHERE active = 1 ORDER BY label ASC')->fetchAll();
+        $channels = $this->db()->query('SELECT * FROM notification_channels WHERE active = 1 ORDER BY label ASC')->fetchAll();
+        foreach ($channels as &$channel) {
+            $channel['label'] = t('notifications.channels.' . $channel['code'], [], (string) $channel['label']);
+        }
+
+        return $channels;
     }
 
     private function roles(): array
     {
         try {
-            return $this->db()->query('SELECT code, label FROM roles ORDER BY sort_order ASC')->fetchAll();
+            $roles = $this->db()->query('SELECT code, label FROM roles ORDER BY sort_order ASC')->fetchAll();
+            foreach ($roles as &$role) {
+                $role['label'] = t('role_labels.' . $role['code'], [], (string) $role['label']);
+            }
+
+            return $roles;
         } catch (\Throwable) {
             return [
-                ['code' => 'admin', 'label' => 'Admins'],
-                ['code' => 'employee', 'label' => 'Darbinieks'],
-                ['code' => 'user', 'label' => 'Lietotājs'],
+                ['code' => 'admin', 'label' => t('role_labels.admin')],
+                ['code' => 'employee', 'label' => t('role_labels.employee')],
+                ['code' => 'user', 'label' => t('role_labels.user')],
             ];
         }
     }
@@ -187,6 +188,18 @@ final class NotificationController
     private function recentNotifications(): array
     {
         return $this->db()->query('SELECT * FROM notifications ORDER BY created_at DESC LIMIT 20')->fetchAll();
+    }
+
+    private function types(): array
+    {
+        return [
+            'info' => t('notifications.types.info'),
+            'success' => t('notifications.types.success'),
+            'warning' => t('notifications.types.warning'),
+            'security' => t('notifications.types.security'),
+            'schedule' => t('notifications.types.schedule'),
+            'account' => t('notifications.types.account'),
+        ];
     }
 
     private function db(): PDO

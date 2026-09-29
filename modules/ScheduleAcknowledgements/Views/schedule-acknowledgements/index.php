@@ -7,13 +7,13 @@
  */
 ?>
 <section class="panel">
-    <h1>Grafika apliecinājumi</h1>
-    <p class="muted">Šeit redzi publicētos grafikus, kuros esi pievienots kā reģistrēts darbinieks.</p>
+    <h1><?= e(t('acknowledgements.title')) ?></h1>
+    <p class="muted"><?= e(t('acknowledgements.description')) ?></p>
 </section>
 
 <section class="panel">
     <?php if (empty($items)): ?>
-        <p>Šobrīd nav grafiku, kuriem nepieciešams apliecinājums.</p>
+        <p><?= e(t('acknowledgements.empty')) ?></p>
     <?php else: ?>
         <div class="request-list">
             <?php foreach ($items as $item): ?>
@@ -25,32 +25,31 @@
                             <span><?= e($item['month']) ?></span>
                         </div>
                         <span class="badge <?= $acknowledged ? '' : 'warning' ?>">
-                            <?= $acknowledged ? 'Iepazinos' : 'Gaida apliecinājumu' ?>
+                            <?= e($acknowledged ? t('acknowledgements.status.acknowledged') : t('acknowledgements.status.pending')) ?>
                         </span>
                     </div>
 
                     <p class="muted">
-                        Maiņas: <?= e((string) $item['shifts_count']) ?>,
-                        stundas: <?= e((string) $item['hours']) ?> h.
+                        <?= e(t('acknowledgements.summary', ['shifts' => $item['shifts_count'], 'hours' => $item['hours']])) ?>
                     </p>
 
                     <?php if ($acknowledged): ?>
-                        <p>Apliecināts: <strong><?= e((string) $item['acknowledged_at']) ?></strong></p>
+                        <p><?= e(t('acknowledgements.acknowledged_at', ['date' => $item['acknowledged_at']])) ?></p>
                         <?php if (!empty($item['comment'])): ?>
-                            <p class="muted">Komentārs: <?= e($item['comment']) ?></p>
+                            <p class="muted"><?= e(t('acknowledgements.comment', ['comment' => $item['comment']])) ?></p>
                         <?php endif; ?>
-                        <a class="button secondary" href="<?= e(url('/schedules/show?id=' . $item['id'])) ?>">Skatīt grafiku</a>
+                        <a class="button secondary" href="<?= e(url('/schedules/show?id=' . $item['id'])) ?>"><?= e(t('acknowledgements.view_schedule')) ?></a>
                     <?php else: ?>
                         <form method="post" action="<?= e(url('/schedule-acknowledgements/ack')) ?>" class="ack-form">
                             <?= csrf_field() ?>
                             <input type="hidden" name="schedule_id" value="<?= e((string) $item['id']) ?>">
                             <div class="form-row">
-                                <label>Komentārs</label>
-                                <input name="comment" type="text" placeholder="Nav obligāts">
+                                <label><?= e(t('common.comment')) ?></label>
+                                <input name="comment" type="text" placeholder="<?= e(t('common.optional')) ?>">
                             </div>
                             <div class="toolbar">
-                                <a class="button secondary" href="<?= e(url('/schedules/show?id=' . $item['id'])) ?>">Skatīt grafiku</a>
-                                <button class="button" type="submit">Apliecinu, ka iepazinos</button>
+                                <a class="button secondary" href="<?= e(url('/schedules/show?id=' . $item['id'])) ?>"><?= e(t('acknowledgements.view_schedule')) ?></a>
+                                <button class="button" type="submit"><?= e(t('acknowledgements.submit')) ?></button>
                             </div>
                         </form>
                     <?php endif; ?>

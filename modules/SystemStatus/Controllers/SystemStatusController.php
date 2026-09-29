@@ -24,7 +24,7 @@ final class SystemStatusController
         $manager = new ModuleManager();
 
         view('system-status/index', [
-            'title' => 'Sistēmas statuss',
+            'title' => t('system_status.title'),
             'phpVersion' => PHP_VERSION,
             'appVersion' => (string) Env::get('APP_VERSION', '1.0.0'),
             'installedModules' => $this->safeInstalledModules($manager),
@@ -57,7 +57,7 @@ final class SystemStatusController
             'schedule_acknowledgements',
         ] as $table) {
             $checks[] = [
-                'label' => 'Tabula: ' . $table,
+                'label' => t('system_status.check.table', ['name' => $table]),
                 'ok' => $this->tableExists($table),
             ];
         }
@@ -67,10 +67,11 @@ final class SystemStatusController
             ['users', 'first_name'],
             ['users', 'last_name'],
             ['users', 'phone'],
+            ['users', 'locale'],
             ['day_off_requests', 'employee_seen_at'],
         ] as [$table, $column]) {
             $checks[] = [
-                'label' => 'Kolonna: ' . $table . '.' . $column,
+                'label' => t('system_status.check.column', ['name' => $table . '.' . $column]),
                 'ok' => $this->columnExists($table, $column),
             ];
         }

@@ -22,11 +22,11 @@ $labelForChange = static function (array $item) use ($markerKind): string {
     $changeType = (string) ($item['change_type'] ?? '');
 
     if ($changeType === 'employee_added') {
-        return 'Pievienots grafikam';
+        return t('schedule_changes.change.employee_added');
     }
 
     if ($changeType === 'employee_removed') {
-        return 'Izņemts no grafika';
+        return t('schedule_changes.change.employee_removed');
     }
 
     $oldCode = strtoupper(trim((string) ($item['old_code'] ?? '')));
@@ -36,55 +36,55 @@ $labelForChange = static function (array $item) use ($markerKind): string {
 
     if ($oldKind === 'regular_day_off' && $newKind !== 'regular_day_off') {
         return match ($newKind) {
-            'mandatory_day_off' => 'Atzīmēta obligātā brīvdiena',
-            'vacation' => 'Pievienota atvaļinājuma diena',
-            'sick_day' => 'Pievienota slimības diena',
-            default => 'Pievienota maiņa',
+            'mandatory_day_off' => t('schedule_changes.change.mandatory_day_off_added'),
+            'vacation' => t('schedule_changes.change.vacation_added'),
+            'sick_day' => t('schedule_changes.change.sick_day_added'),
+            default => t('schedule_changes.change.shift_added'),
         };
     }
 
     if ($oldKind !== 'regular_day_off' && $newKind === 'regular_day_off') {
         return match ($oldKind) {
-            'mandatory_day_off' => 'Noņemta obligātā brīvdiena',
-            'vacation' => 'Noņemta atvaļinājuma diena',
-            'sick_day' => 'Noņemta slimības diena',
-            default => 'Noņemta maiņa',
+            'mandatory_day_off' => t('schedule_changes.change.mandatory_day_off_removed'),
+            'vacation' => t('schedule_changes.change.vacation_removed'),
+            'sick_day' => t('schedule_changes.change.sick_day_removed'),
+            default => t('schedule_changes.change.shift_removed'),
         };
     }
 
     if ($oldKind === 'mandatory_day_off' && $newKind === 'shift') {
-        return 'Obligātā brīvdiena nomainīta uz maiņu';
+        return t('schedule_changes.change.day_off_to_shift');
     }
 
     if ($oldKind === 'shift' && $newKind === 'mandatory_day_off') {
-        return 'Maiņa nomainīta uz obligāto brīvdienu';
+        return t('schedule_changes.change.shift_to_day_off');
     }
 
     if ($oldKind === 'shift' && $newKind === 'shift') {
-        return 'Mainīta maiņa';
+        return t('schedule_changes.change.shift_changed');
     }
 
-    return 'Mainīts marķējums';
+    return t('schedule_changes.change.marker_changed');
 };
 $code = static function (?string $value): string {
     $value = strtoupper(trim((string) $value));
 
     if ($value === '') {
-        return 'Parasta brīvdiena';
+        return t('schedule_changes.codes.regular_day_off');
     }
 
     $labels = [
-        'S' => 'Slimības diena',
-        'A' => 'Atvaļinājuma diena',
-        'N' => 'Nakts maiņa',
-        'D*' => 'Dienas maiņu vadītājs',
-        'D' => 'Dienas maiņa',
-        'X' => 'Obligāta brīvdiena',
-        'N*' => 'Nakts maiņu vadītājs',
-        'DT' => 'Dienas maiņa',
-        'NT' => 'Nakts maiņa',
-        'DT*' => 'Dienas maiņu vadītājs',
-        'NT*' => 'Nakts maiņu vadītājs',
+        'S' => t('schedule_changes.codes.sick_day'),
+        'A' => t('schedule_changes.codes.vacation'),
+        'N' => t('schedule_changes.codes.night_shift'),
+        'D*' => t('schedule_changes.codes.day_leader'),
+        'D' => t('schedule_changes.codes.day_shift'),
+        'X' => t('schedule_changes.codes.mandatory_day_off'),
+        'N*' => t('schedule_changes.codes.night_leader'),
+        'DT' => t('schedule_changes.codes.day_shift'),
+        'NT' => t('schedule_changes.codes.night_shift'),
+        'DT*' => t('schedule_changes.codes.day_leader'),
+        'NT*' => t('schedule_changes.codes.night_leader'),
     ];
 
     return isset($labels[$value]) ? $value . ' - ' . $labels[$value] : $value;
@@ -227,8 +227,8 @@ $codeClass = static function (?string $value): string {
 <section class="panel">
     <div class="page-title-row">
         <div>
-            <h1>Grafika izmaiņu žurnāls</h1>
-            <p class="muted">Pārskats par publicētu grafiku labojumiem, skartajiem darbiniekiem un maiņu izmaiņām.</p>
+            <h1><?= e(t('schedule_changes.admin.title')) ?></h1>
+            <p class="muted"><?= e(t('schedule_changes.admin.description')) ?></p>
         </div>
     </div>
 </section>
@@ -236,9 +236,9 @@ $codeClass = static function (?string $value): string {
 <section class="panel">
     <form method="get" action="<?= e(url('/schedule-changes/admin')) ?>" class="journal-filter-grid">
         <div>
-            <label>Grafiks</label>
+            <label><?= e(t('schedule_changes.admin.schedule')) ?></label>
             <select name="schedule_id">
-                <option value="0">Visi grafiki</option>
+                <option value="0"><?= e(t('schedule_changes.admin.all_schedules')) ?></option>
                 <?php foreach ($schedules as $schedule): ?>
                     <option value="<?= e((string) $schedule['id']) ?>" <?= (int) $selectedScheduleId === (int) $schedule['id'] ? 'selected' : '' ?>>
                         <?= e($schedule['schedule_name']) ?><?= !empty($schedule['month']) ? ' · ' . e($schedule['month']) : '' ?>
@@ -247,9 +247,9 @@ $codeClass = static function (?string $value): string {
             </select>
         </div>
         <div>
-            <label>Darbinieks</label>
+            <label><?= e(t('schedules.employee')) ?></label>
             <select name="user_id">
-                <option value="0">Visi darbinieki</option>
+                <option value="0"><?= e(t('schedule_changes.admin.all_employees')) ?></option>
                 <?php foreach ($users as $user): ?>
                     <option value="<?= e((string) $user['id']) ?>" <?= (int) $selectedUserId === (int) $user['id'] ? 'selected' : '' ?>>
                         <?= e($userLabel($user)) ?>
@@ -258,15 +258,15 @@ $codeClass = static function (?string $value): string {
             </select>
         </div>
         <div class="journal-filter-actions">
-            <button class="button" type="submit">Filtrēt</button>
-            <a class="button secondary" href="<?= e(url('/schedule-changes/admin')) ?>">Notīrīt</a>
+            <button class="button" type="submit"><?= e(t('common.filter')) ?></button>
+            <a class="button secondary" href="<?= e(url('/schedule-changes/admin')) ?>"><?= e(t('common.clear')) ?></a>
         </div>
     </form>
 </section>
 
 <?php if (empty($batches)): ?>
     <section class="panel">
-        <p>Izmaiņu žurnālā vēl nav ierakstu.</p>
+        <p><?= e(t('schedule_changes.empty')) ?></p>
     </section>
 <?php else: ?>
     <div class="notification-list">
@@ -276,8 +276,7 @@ $codeClass = static function (?string $value): string {
                 <div>
                     <strong><?= e($batch['schedule_name']) ?></strong>
                     <small>
-                        <?= e((string) $batch['created_at']) ?> · <?= e($batch['month'] ?? '') ?> · <?= e((string) ($batch['summary'] ?? '')) ?>
-                        · <?= e((string) ($batch['affected_users'] ?? 0)) ?> darbinieki
+                        <?= e((string) $batch['created_at']) ?> · <?= e($batch['month'] ?? '') ?> · <?= e(t('schedule_changes.summary', ['changes' => $batch['item_count'] ?? 0, 'employees' => $batch['affected_users'] ?? 0])) ?>
                     </small>
                 </div>
 

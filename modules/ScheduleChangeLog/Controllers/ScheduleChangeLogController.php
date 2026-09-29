@@ -26,12 +26,12 @@ final class ScheduleChangeLogController
         $userId = (int) ($user['id'] ?? 0);
 
         view('schedule-change-log/index', [
-            'title' => 'Grafika izmaiņas',
+            'title' => t('schedule_changes.title'),
             'batches' => $this->employeeBatches($userId),
             'itemsByBatch' => $this->employeeItemsByBatch($userId),
         ]);
 
-        ActivityLogger::log('schedule_changes_viewed', 'schedule', null, 'Darbinieks apskatīja grafika izmaiņas.', $user);
+        ActivityLogger::log('schedule_changes_viewed', 'schedule', null, 'schedule changes viewed', $user);
     }
 
     public function markRead(): void
@@ -41,7 +41,7 @@ final class ScheduleChangeLogController
 
         $batchId = (int) ($_POST['batch_id'] ?? 0);
         if ($batchId <= 0 || !$this->batchVisibleToUser($batchId, (int) $user['id'])) {
-            throw new HttpException(403, 'Šīs izmaiņas nav pieejamas.');
+            throw new HttpException(403, t('schedule_changes.forbidden'));
         }
 
         $stmt = $this->db()->prepare(
@@ -51,7 +51,7 @@ final class ScheduleChangeLogController
         );
         $stmt->execute([$batchId, (int) $user['id']]);
 
-        Session::flash('success', 'Izmaiņas atzīmētas kā apskatītas.');
+        Session::flash('success', t('schedule_changes.mark_read.success'));
         redirect('/schedule-changes');
     }
 
@@ -65,7 +65,7 @@ final class ScheduleChangeLogController
         $this->markBatchesReadForUser($batches, (int) $admin['id']);
 
         view('schedule-change-log/admin', [
-            'title' => 'Grafika izmaiņu žurnāls',
+            'title' => t('schedule_changes.admin.title'),
             'schedules' => $this->schedules(),
             'users' => $this->users(),
             'selectedScheduleId' => $scheduleId,
@@ -74,7 +74,7 @@ final class ScheduleChangeLogController
             'itemsByBatch' => $this->adminItemsByBatch($scheduleId, $userId),
         ]);
 
-        ActivityLogger::log('schedule_changes_admin_viewed', 'schedule', $scheduleId ?: null, 'Admins apskatīja grafika izmaiņu žurnālu.', $admin);
+        ActivityLogger::log('schedule_changes_admin_viewed', 'schedule', $scheduleId ?: null, 'schedule change log viewed', $admin);
     }
 
     private function employeeBatches(int $userId): array

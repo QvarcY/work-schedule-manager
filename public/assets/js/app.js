@@ -5,6 +5,16 @@
  * Additional terms: see ADDITIONAL_TERMS.md
  */
 
+const appTranslations = window.appTranslations || {};
+
+function translate(key, replacements = {}) {
+    let message = typeof appTranslations[key] === 'string' ? appTranslations[key] : key;
+    Object.entries(replacements).forEach(([name, value]) => {
+        message = message.split(`{${name}}`).join(String(value));
+    });
+    return message;
+}
+
 document.addEventListener('submit', (event) => {
     const form = event.target;
     if (!form.matches('[data-confirm]')) {
@@ -54,7 +64,7 @@ if (editor && editorForm) {
     holidayList?.querySelectorAll('.holiday-item').forEach((item) => {
         holidays.set(Number(item.dataset.day), {
             day: Number(item.dataset.day),
-            label: item.querySelector('.holiday-name')?.textContent.trim() || 'Svetku diena',
+            label: item.querySelector('.holiday-name')?.textContent.trim() || translate('js.holiday_default'),
             background_color: item.dataset.bg || '#fde68a',
             text_color: item.dataset.text || '#111827',
         });
@@ -70,14 +80,14 @@ if (editor && editorForm) {
 
             items.push(`
                 <div class="summary-chip">
-                    <strong>${name}</strong>
-                    <span>${row.querySelector('.summary-shifts').textContent} mainas</span>
+                    <strong>${escapeHtml(name)}</strong>
+                    <span>${translate('js.shift_count', { count: row.querySelector('.summary-shifts').textContent })}</span>
                     <span>${row.querySelector('.summary-hours').textContent} h</span>
                 </div>
             `);
         });
 
-        summary.innerHTML = items.length ? items.join('') : '<p class="muted">Nav aizpilditu darbinieku.</p>';
+        summary.innerHTML = items.length ? items.join('') : `<p class="muted">${escapeHtml(translate('js.no_employees_filled'))}</p>`;
     };
 
     const applyShiftStyle = (input) => {
@@ -153,9 +163,9 @@ if (editor && editorForm) {
             item.innerHTML = `
                 <span class="holiday-color-dot" style="background: ${holiday.background_color};"></span>
                 <strong>${holiday.day}.</strong>
-                <span class="holiday-name">${holiday.label}</span>
-                <button class="link-button holiday-edit" type="button">L</button>
-                <button class="link-button holiday-remove" type="button">x</button>
+                <span class="holiday-name">${escapeHtml(holiday.label)}</span>
+                <button class="link-button holiday-edit" type="button">${escapeHtml(translate('js.edit_short'))}</button>
+                <button class="link-button holiday-remove" type="button" aria-label="${escapeHtml(translate('js.delete'))}">×</button>
             `;
 
             item.querySelector('.holiday-remove').addEventListener('click', () => {
@@ -193,7 +203,7 @@ if (editor && editorForm) {
                     .some((otherRow) => otherRow !== row && otherRow.querySelector('.employee-user-id-input')?.value === userId);
 
                 if (alreadyLinked) {
-                    window.alert('Šis darbinieks grafikā jau ir piesaistīts citai rindai.');
+                    window.alert(translate('js.employee_already_linked'));
                     linkSelect.value = linkSelect.dataset.previousValue || '';
                     return;
                 }
@@ -226,25 +236,25 @@ if (editor && editorForm) {
         if (registeredSelect) {
             const options = Array.from(registeredSelect.options).map((option) => {
                 const value = option.value || '';
-                const label = value ? option.textContent.trim() : 'Nav piesaistīts kontam';
+                const label = value ? option.textContent.trim() : translate('js.not_linked');
                 const displayName = option.dataset.displayName || '';
                 const selected = value === userId ? ' selected' : '';
                 return `<option value="${escapeHtml(value)}" data-display-name="${escapeHtml(displayName)}"${selected}>${escapeHtml(label)}</option>`;
             }).join('');
-            linkSelect = `<select class="employee-link-select" aria-label="Piesaistīt reģistrētam darbiniekam">${options}</select>`;
+            linkSelect = `<select class="employee-link-select" aria-label="${escapeHtml(translate('js.link_employee'))}">${options}</select>`;
         }
 
         let html = `
             <td class="employee-col">
                 <input class="employee-user-id-input" type="hidden" value="${escapeHtml(userId)}">
-                <input class="employee-name-input" type="text" value="${escapeHtml(employeeName)}" placeholder="Vards">
+                <input class="employee-name-input" type="text" value="${escapeHtml(employeeName)}" placeholder="${escapeHtml(translate('js.employee_name'))}">
                 ${linkSelect}
             </td>
         `;
         for (let day = 1; day <= 31; day += 1) {
             html += `<td><input class="shift-editor-input" type="text" maxlength="4" data-day="${day}"></td>`;
         }
-        html += '<td class="summary-shifts" hidden>0</td><td class="summary-hours" hidden>0</td><td class="no-print"><button class="link-button remove-employee-row" type="button">Dzest</button></td>';
+        html += `<td class="summary-shifts" hidden>0</td><td class="summary-hours" hidden>0</td><td class="no-print"><button class="link-button remove-employee-row" type="button">${escapeHtml(translate('js.delete'))}</button></td>`;
         row.innerHTML = html;
 
         tbody.appendChild(row);
@@ -266,7 +276,7 @@ if (editor && editorForm) {
 
         const userId = option && option.value ? option.value : '';
         if (!userId) {
-            window.alert('Izvēlies reģistrētu darbinieku no saraksta.');
+            window.alert(translate('js.select_registered_employee'));
             return;
         }
 
@@ -274,7 +284,7 @@ if (editor && editorForm) {
             .some((input) => input.value === userId);
 
         if (alreadyAdded) {
-            window.alert('Darbinieks jau ir pievienots grafikam.');
+            window.alert(translate('js.employee_already_added'));
             return;
         }
 
@@ -301,7 +311,7 @@ if (editor && editorForm) {
     document.getElementById('add-holiday')?.addEventListener('click', () => {
         const day = Number(document.getElementById('holiday-day').value);
         const [background, text] = document.getElementById('holiday-color').value.split('|');
-        const label = document.getElementById('holiday-name').value.trim() || 'Svetku diena';
+        const label = document.getElementById('holiday-name').value.trim() || translate('js.holiday_default');
 
         holidays.set(day, { day, label, background_color: background, text_color: text });
         document.getElementById('holiday-name').value = '';
@@ -343,7 +353,7 @@ if (editor && editorForm) {
                 daySettingsByDay.set(day, {
                     day,
                     type: 'saturday',
-                    label: 'Brivdiena',
+                    label: translate('js.regular_day_off'),
                     background_color: '#d7e0ea',
                     text_color: '#111827',
                 });
@@ -407,13 +417,13 @@ if (scheduleImageExportButton) {
     scheduleImageExportButton.addEventListener('click', async () => {
         const originalLabel = scheduleImageExportButton.textContent;
         scheduleImageExportButton.disabled = true;
-        scheduleImageExportButton.textContent = 'Gatavo attēlu...';
+        scheduleImageExportButton.textContent = translate('js.preparing_image');
 
         try {
             await exportScheduleAsImage();
         } catch (error) {
             console.error(error);
-            window.alert('Neizdevās izveidot attēlu. Pamēģini vēlreiz vai izmanto Drukāt / PDF opciju.');
+            window.alert(translate('js.image_failed'));
         } finally {
             scheduleImageExportButton.disabled = false;
             scheduleImageExportButton.textContent = originalLabel;
@@ -427,11 +437,11 @@ async function exportScheduleAsImage() {
         throw new Error('Schedule table not found.');
     }
 
-    const title = document.querySelector('.page-title-row h1')?.textContent.trim() || 'Grafiks';
+    const title = document.querySelector('.page-title-row h1')?.textContent.trim() || translate('js.schedule_default');
     const meta = document.querySelector('.page-title-row .muted')?.textContent.trim() || '';
     const scheduleTable = cleanExportClone(table);
-    const holidayPanel = findPanelByClassOrHeading('holiday-list', 'Svetku dienas');
-    const summaryPanel = findPanelByClassOrHeading('summary-grid', 'Stundu kopsavilkums');
+    const holidayPanel = findPanelByClassOrHeading('holiday-list', translate('js.holidays'));
+    const summaryPanel = findPanelByClassOrHeading('summary-grid', translate('js.hours_summary'));
     const legendPanel = document.querySelector('.schedule-legend-panel');
 
     const blocks = [
@@ -479,7 +489,7 @@ async function exportScheduleAsImage() {
         context.drawImage(image, 0, 0, width, height);
 
         const blob = await canvasToBlob(canvas);
-        const fileName = `${slugify(title || 'grafiks')}.png`;
+        const fileName = `${slugify(title || translate('js.schedule_default'))}.png`;
         await saveBlobForDevice(blob, fileName, title);
     } finally {
         URL.revokeObjectURL(imageUrl);
@@ -543,7 +553,7 @@ async function saveBlobForDevice(blob, fileName, title) {
         const file = new File([blob], fileName, { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
             try {
-                await navigator.share({ files: [file], title: title || 'Grafiks' });
+                await navigator.share({ files: [file], title: title || translate('js.schedule_default') });
                 return;
             } catch (error) {
                 if (error && error.name === 'AbortError') return;
@@ -573,7 +583,7 @@ function slugify(value) {
         .replace(/[^a-zA-Z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '')
         .toLowerCase()
-        .slice(0, 80) || 'grafiks';
+        .slice(0, 80) || 'schedule';
 }
 
 // Mobile-safe exporter: draws the schedule directly on canvas instead of using SVG foreignObject.
@@ -581,7 +591,7 @@ async function exportScheduleAsImage() {
     const table = document.querySelector('[data-full-month-table]');
     if (!table) throw new Error('Schedule table not found.');
 
-    const title = document.querySelector('.page-title-row h1')?.textContent.trim() || 'Grafiks';
+    const title = document.querySelector('.page-title-row h1')?.textContent.trim() || translate('js.schedule_default');
     const meta = document.querySelector('.page-title-row .muted')?.textContent.trim() || '';
     const rows = Array.from(table.tBodies[0]?.rows || []);
     const headers = Array.from(table.tHead?.rows[0]?.cells || []);
@@ -628,21 +638,21 @@ async function exportScheduleAsImage() {
     y += headerHeight + Math.max(rows.length, 1) * rowHeight + sectionGap;
 
     if (holidays.length) {
-        y = drawExportSection(ctx, 'Svētku dienas', holidays.map((item) => ({
+        y = drawExportSection(ctx, translate('js.holidays'), holidays.map((item) => ({
             label: item.textContent.replace(/\s+/g, ' ').trim(),
             color: item.querySelector('.holiday-color-dot') ? canvasColor(item.querySelector('.holiday-color-dot'), 'backgroundColor', '#fde68a') : '#fde68a',
         })), padding, y, tableWidth, 4, 'holiday') + sectionGap;
     }
 
     if (summaries.length) {
-        y = drawExportSection(ctx, 'Stundu kopsavilkums', summaries.map((item) => ({
+        y = drawExportSection(ctx, translate('js.hours_summary'), summaries.map((item) => ({
             label: item.textContent.replace(/\s+/g, ' ').trim(),
             color: '#0f766e',
         })), padding, y, tableWidth, 4, 'summary') + sectionGap;
     }
 
     if (legends.length) {
-        y = drawExportSection(ctx, 'Leģenda', legends.map((item) => {
+        y = drawExportSection(ctx, translate('js.legend'), legends.map((item) => {
             const token = item.querySelector('.shift-token');
             const label = Array.from(item.childNodes).map((node) => node.textContent || '').join(' ').replace(/\s+/g, ' ').trim();
             return {
@@ -655,7 +665,7 @@ async function exportScheduleAsImage() {
     }
 
     const blob = await canvasToBlob(canvas);
-    await saveBlobForDevice(blob, `${slugify(title || 'grafiks')}.png`, title);
+    await saveBlobForDevice(blob, `${slugify(title || translate('js.schedule_default'))}.png`, title);
 }
 
 function drawScheduleTable(ctx, table, headers, rows, x, y, tableWidth, employeeWidth, dayWidth, headerHeight, rowHeight) {
@@ -677,7 +687,7 @@ function drawScheduleTable(ctx, table, headers, rows, x, y, tableWidth, employee
         ctx.fillStyle = '#526173';
         ctx.font = '13px Arial, Helvetica, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText('Šim grafikam vēl nav darbinieku.', x + 8, y + headerHeight + rowHeight / 2);
+        ctx.fillText(translate('js.no_employees'), x + 8, y + headerHeight + rowHeight / 2);
         return;
     }
 

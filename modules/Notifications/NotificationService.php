@@ -122,7 +122,7 @@ final class NotificationService
                 sent_at TIMESTAMP NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
         );
-        $db->exec("INSERT INTO notification_channels (code, label, active) VALUES ('system', 'Sistēmā', 1) ON DUPLICATE KEY UPDATE label = VALUES(label), active = VALUES(active)");
+        $db->exec("INSERT INTO notification_channels (code, label, active) VALUES ('system', 'System', 1) ON DUPLICATE KEY UPDATE label = VALUES(label), active = VALUES(active)");
     }
 
     private function deliverExternalChannels(int $notificationId, array $userIds): void

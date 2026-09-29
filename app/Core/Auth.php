@@ -43,6 +43,10 @@ final class Auth
         Session::regenerate();
         Session::put('user_id', (int) $user['id']);
 
+        if (!empty($user['locale'])) {
+            Translator::setLocale((string) $user['locale']);
+        }
+
         return true;
     }
 
@@ -68,7 +72,7 @@ final class Auth
         $user = $this->requireLogin();
 
         if (($user['role'] ?? '') !== 'admin') {
-            throw new HttpException(403, 'Šai darbībai nepieciešamas admin tiesības.');
+            throw new HttpException(403, t('security.admin_required'));
         }
 
         return $user;

@@ -7,6 +7,17 @@ The format is based loosely on Keep a Changelog.
 
 ## [Unreleased]
 
+### Added
+
+- Core translation runtime with fallback language support
+- Latvian and English catalogues for the bundled application interface and
+  module workflows
+- Per-user language preference and a language selector for anonymous sessions
+- Module-owned translation catalogues and localized module metadata
+- Translation management module with coverage reporting, JSON export and
+  installation-level override import
+- Translation catalogue validation in the CLI tooling and CI
+
 ## [1.0.0] - 2026-09-29
 
 ### Added

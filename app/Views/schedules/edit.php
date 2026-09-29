@@ -36,21 +36,21 @@ if (empty($employees)) {
 <section class="panel">
     <div class="page-title-row">
         <div>
-            <h1>Labot grafiku</h1>
+            <h1><?= e(t('schedules.edit.title')) ?></h1>
             <p class="muted"><?= e($schedule['schedule_name']) ?> · <?= e($schedule['month']) ?></p>
         </div>
         <div class="toolbar no-print">
-            <button class="button" type="submit" form="schedule-editor-form">Saglabat</button>
-            <a class="button secondary" href="<?= e(url('/schedules/show?id=' . $schedule['id'])) ?>">Skatit</a>
+            <button class="button" type="submit" form="schedule-editor-form"><?= e(t('common.save')) ?></button>
+            <a class="button secondary" href="<?= e(url('/schedules/show?id=' . $schedule['id'])) ?>"><?= e(t('common.view')) ?></a>
             <form method="post" action="<?= e(url('/schedules/publish')) ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="schedule_id" value="<?= e((string) $schedule['id']) ?>">
-                <button class="button secondary" type="submit">Publicet</button>
+                <button class="button secondary" type="submit"><?= e(t('schedules.publish.submit')) ?></button>
             </form>
-            <form method="post" action="<?= e(url('/schedules/delete')) ?>" data-confirm="Vai tiesam dzest so grafiku?">
+            <form method="post" action="<?= e(url('/schedules/delete')) ?>" data-confirm="<?= e(t('schedules.delete.confirm')) ?>">
                 <?= csrf_field() ?>
                 <input type="hidden" name="schedule_id" value="<?= e((string) $schedule['id']) ?>">
-                <button class="button danger" type="submit">Dzest</button>
+                <button class="button danger" type="submit"><?= e(t('common.delete')) ?></button>
             </form>
         </div>
     </div>
@@ -65,17 +65,17 @@ if (empty($employees)) {
 
         <div class="editor-meta-grid">
             <div class="form-row">
-                <label for="schedule_name">Grafika nosaukums</label>
+                <label for="schedule_name"><?= e(t('schedules.fields.name')) ?></label>
                 <input id="schedule_name" name="schedule_name" type="text" value="<?= e($schedule['schedule_name']) ?>" required>
             </div>
             <div class="form-row">
-                <label for="month">Menesis</label>
+                <label for="month"><?= e(t('schedules.fields.month')) ?></label>
                 <input id="month" name="month" type="text" value="<?= e($schedule['month']) ?>" required>
             </div>
             <div class="form-row">
-                <label for="status">Statuss</label>
+                <label for="status"><?= e(t('schedules.fields.status')) ?></label>
                 <select id="status" name="status">
-                    <?php foreach (['draft' => 'Melnraksts', 'published' => 'Publicets', 'archived' => 'Arhivets'] as $value => $label): ?>
+                    <?php foreach (['draft' => t('schedule.status.draft'), 'published' => t('schedule.status.published'), 'archived' => t('schedule.status.archived')] as $value => $label): ?>
                         <option value="<?= e($value) ?>" <?= $schedule['status'] === $value ? 'selected' : '' ?>><?= e($label) ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -85,12 +85,12 @@ if (empty($employees)) {
         <div class="editor-section">
             <div class="section-heading">
                 <div>
-                    <h2>Grafika tabula</h2>
-                    <p class="muted">Klikskini uz datumiem, lai atzimetu brivdienas. Ievadi kodus, piemeram D, N, DT, A, S.</p>
+                    <h2><?= e(t('schedules.editor.table')) ?></h2>
+                    <p class="muted"><?= e(t('schedules.editor.instructions')) ?></p>
                 </div>
                 <div class="toolbar no-print">
                     <select id="registered-employee-select" class="compact-select">
-                        <option value=""><?= empty($registeredEmployees) ? 'Nav pieejamu reģistrētu darbinieku' : 'Reģistrēts darbinieks' ?></option>
+                        <option value=""><?= e(empty($registeredEmployees) ? t('schedules.editor.no_registered_employees') : t('schedules.editor.registered_employee')) ?></option>
                         <?php if (!empty($registeredEmployees)): ?>
                             <?php foreach ($registeredEmployees as $registeredEmployee): ?>
                                 <?php
@@ -114,10 +114,10 @@ if (empty($employees)) {
                         <?php endif; ?>
                     </select>
                     <?php if (!empty($registeredEmployees)): ?>
-                        <button class="button secondary" type="button" id="add-registered-employee">Pievienot no saraksta</button>
+                        <button class="button secondary" type="button" id="add-registered-employee"><?= e(t('schedules.editor.add_from_list')) ?></button>
                     <?php endif; ?>
-                    <button class="button secondary" type="button" id="add-employee-row">Pievienot darbinieku</button>
-                    <button class="button secondary" type="button" id="toggle-compact-schedule">Kompakts skats</button>
+                    <button class="button secondary" type="button" id="add-employee-row"><?= e(t('schedules.editor.add_employee')) ?></button>
+                    <button class="button secondary" type="button" id="toggle-compact-schedule"><?= e(t('schedules.editor.compact_view')) ?></button>
                 </div>
             </div>
 
@@ -125,7 +125,7 @@ if (empty($employees)) {
                 <table class="schedule-grid editor-grid" id="schedule-editor" data-shift-types='<?= e(json_encode($shiftTypes, JSON_UNESCAPED_UNICODE)) ?>'>
                     <thead>
                         <tr>
-                            <th class="employee-col">Darbinieks</th>
+                            <th class="employee-col"><?= e(t('schedules.employee')) ?></th>
                             <?php foreach ($days as $day): ?>
                                 <?php
                                     $setting = $daySettings[$day] ?? null;
@@ -140,7 +140,7 @@ if (empty($employees)) {
                                     data-day="<?= $day ?>"
                                     data-weekend="<?= $isWeekend ? '1' : '0' ?>"
                                     style="<?= $style ?>"
-                                    title="Klikskini, lai ieslegtu/izslegtu brivdienu"
+                                    title="<?= e(t('schedules.editor.toggle_day_off')) ?>"
                                 ><?= $day ?></th>
                             <?php endforeach; ?>
                             <th class="no-print"></th>
@@ -157,9 +157,9 @@ if (empty($employees)) {
                             <tr class="employee-editor-row">
                                 <td class="employee-col">
                                     <input class="employee-user-id-input" type="hidden" value="<?= e((string) ($employee['user_id'] ?? '')) ?>">
-                                    <input class="employee-name-input" type="text" value="<?= e($employee['name'] ?? '') ?>" placeholder="Vards">
-                                    <select class="employee-link-select" aria-label="Piesaistīt reģistrētam darbiniekam">
-                                        <option value=""><?= empty($registeredEmployees) ? 'Nav pieejamu kontu piesaistei' : 'Nav piesaistīts kontam' ?></option>
+                                    <input class="employee-name-input" type="text" value="<?= e($employee['name'] ?? '') ?>" placeholder="<?= e(t('users.fields.first_name')) ?>">
+                                    <select class="employee-link-select" aria-label="<?= e(t('schedules.editor.link_employee')) ?>">
+                                        <option value=""><?= e(empty($registeredEmployees) ? t('schedules.editor.no_accounts') : t('schedules.editor.not_linked')) ?></option>
                                         <?php if (!empty($registeredEmployees)): ?>
                                             <?php foreach ($registeredEmployees as $registeredEmployee): ?>
                                                 <?php
@@ -191,7 +191,7 @@ if (empty($employees)) {
                                 <?php endforeach; ?>
                                 <td class="summary-shifts" hidden><?= e((string) ($employee['shifts_count'] ?? 0)) ?></td>
                                 <td class="summary-hours" hidden><?= e((string) ($employee['hours'] ?? 0)) ?></td>
-                                <td class="no-print"><button class="link-button remove-employee-row" type="button">Dzest</button></td>
+                                <td class="no-print"><button class="link-button remove-employee-row" type="button"><?= e(t('common.delete')) ?></button></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -202,8 +202,8 @@ if (empty($employees)) {
         <div class="editor-section holiday-editor">
             <div class="section-heading">
                 <div>
-                    <h2>Svetku dienas</h2>
-                    <p class="muted">Pievieno tikai ipasas dienas. Brivdienas atzime ar klikšķi uz datumiem grafika galvene.</p>
+                    <h2><?= e(t('schedules.holidays')) ?></h2>
+                    <p class="muted"><?= e(t('schedules.editor.holiday_instructions')) ?></p>
                 </div>
             </div>
 
@@ -214,19 +214,19 @@ if (empty($employees)) {
                     <?php endforeach; ?>
                 </select>
                 <select id="holiday-color">
-                    <option value="#fde68a|#111827">Dzeltens</option>
-                    <option value="#fecaca|#7f1d1d">Sarkans</option>
-                    <option value="#bbf7d0|#14532d">Zals</option>
-                    <option value="#bfdbfe|#1e3a8a">Zils</option>
-                    <option value="#ddd6fe|#4c1d95">Violets</option>
-                    <option value="#fed7aa|#7c2d12">Oranzs</option>
-                    <option value="#e5e7eb|#111827">Peleks</option>
-                    <option value="#fbcfe8|#831843">Rozā</option>
-                    <option value="#ccfbf1|#134e4a">Tirkizs</option>
-                    <option value="#fef3c7|#78350f">Gaisi dzeltens</option>
+                    <option value="#fde68a|#111827"><?= e(t('colors.yellow')) ?></option>
+                    <option value="#fecaca|#7f1d1d"><?= e(t('colors.red')) ?></option>
+                    <option value="#bbf7d0|#14532d"><?= e(t('colors.green')) ?></option>
+                    <option value="#bfdbfe|#1e3a8a"><?= e(t('colors.blue')) ?></option>
+                    <option value="#ddd6fe|#4c1d95"><?= e(t('colors.violet')) ?></option>
+                    <option value="#fed7aa|#7c2d12"><?= e(t('colors.orange')) ?></option>
+                    <option value="#e5e7eb|#111827"><?= e(t('colors.gray')) ?></option>
+                    <option value="#fbcfe8|#831843"><?= e(t('colors.pink')) ?></option>
+                    <option value="#ccfbf1|#134e4a"><?= e(t('colors.turquoise')) ?></option>
+                    <option value="#fef3c7|#78350f"><?= e(t('colors.light_yellow')) ?></option>
                 </select>
-                <input id="holiday-name" type="text" placeholder="Nosaukums">
-                <button class="button secondary" type="button" id="add-holiday">Pievienot</button>
+                <input id="holiday-name" type="text" placeholder="<?= e(t('schedules.fields.name')) ?>">
+                <button class="button secondary" type="button" id="add-holiday"><?= e(t('common.add')) ?></button>
             </div>
 
             <div class="holiday-list" id="holiday-list">
@@ -234,9 +234,9 @@ if (empty($employees)) {
                     <div class="holiday-item" data-day="<?= $day ?>" data-bg="<?= e($holiday['background_color'] ?: '#fde68a') ?>" data-text="<?= e($holiday['text_color'] ?: '#111827') ?>">
                         <span class="holiday-color-dot" style="background: <?= e($holiday['background_color'] ?: '#fde68a') ?>;"></span>
                         <strong><?= $day ?>.</strong>
-                        <span class="holiday-name"><?= e($holiday['label'] ?: 'Svetku diena') ?></span>
-                        <button class="link-button holiday-edit" type="button">L</button>
-                        <button class="link-button holiday-remove" type="button">x</button>
+                        <span class="holiday-name"><?= e($holiday['label'] ?: t('schedules.holiday_default')) ?></span>
+                        <button class="link-button holiday-edit" type="button"><?= e(t('common.edit_short')) ?></button>
+                        <button class="link-button holiday-remove" type="button" aria-label="<?= e(t('common.delete')) ?>">×</button>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -245,12 +245,12 @@ if (empty($employees)) {
 </section>
 
 <section class="panel">
-    <h2>Stundu kopsavilkums</h2>
+    <h2><?= e(t('schedules.hours_summary')) ?></h2>
     <div class="summary-grid" id="editor-summary"></div>
 </section>
 
 <section class="panel schedule-legend-panel">
-    <h2>Legenda</h2>
+    <h2><?= e(t('schedules.legend')) ?></h2>
     <div class="legend-grid">
         <?php foreach ($shiftTypes as $type): ?>
             <div class="legend-item">

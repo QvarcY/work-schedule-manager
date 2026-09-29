@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Csrf;
+use App\Core\HttpException;
 use App\Core\Session;
 use App\Services\ActivityLogger;
 use App\Services\ModuleManager;
@@ -30,12 +31,12 @@ final class ModuleController
         try {
             $availableModules = $manager->availableModules();
             $installedModules = $manager->installedModules();
-        } catch (\Throwable $exception) {
-            $error = $exception->getMessage();
+        } catch (\Throwable) {
+            $error = t('modules.load_error');
         }
 
         view('modules/index', [
-            'title' => 'Moduli',
+            'title' => t('modules.title'),
             'availableModules' => $availableModules,
             'installedModules' => $installedModules,
             'moduleError' => $error,
@@ -51,7 +52,7 @@ final class ModuleController
         (new ModuleManager())->install($moduleName);
         ActivityLogger::log('module_installed', 'module', null, $moduleName);
 
-        Session::flash('success', 'Modulis uzstadits.');
+        Session::flash('success', t('modules.install.success'));
         redirect('/modules');
     }
 
@@ -63,9 +64,9 @@ final class ModuleController
         try {
             $moduleName = (new ModuleManager())->upload($_FILES['module_zip'] ?? []);
             ActivityLogger::log('module_uploaded', 'module', null, $moduleName);
-            Session::flash('success', 'Modulis augshupieladets vai atjauninats: ' . $moduleName . '.');
+            Session::flash('success', t('modules.upload.success', ['module' => $moduleName]));
         } catch (\Throwable $exception) {
-            Session::flash('error', $exception->getMessage());
+            Session::flash('error', $exception instanceof HttpException ? $exception->getMessage() : t('modules.upload.failed'));
         }
 
         redirect('/modules');
@@ -79,7 +80,7 @@ final class ModuleController
         $moduleName = trim((string) ($_POST['module'] ?? ''));
         (new ModuleManager())->setActive($moduleName, true);
         ActivityLogger::log('module_activated', 'module', null, $moduleName);
-        Session::flash('success', 'Modulis aktivizets.');
+        Session::flash('success', t('modules.activate.success'));
         redirect('/modules');
     }
 
@@ -91,7 +92,7 @@ final class ModuleController
         $moduleName = trim((string) ($_POST['module'] ?? ''));
         (new ModuleManager())->setActive($moduleName, false);
         ActivityLogger::log('module_deactivated', 'module', null, $moduleName);
-        Session::flash('success', 'Modulis deaktivizets.');
+        Session::flash('success', t('modules.deactivate.success'));
         redirect('/modules');
     }
 
@@ -104,7 +105,7 @@ final class ModuleController
         $moduleName = trim((string) ($_POST['module'] ?? ''));
         (new ModuleManager())->uninstall($moduleName, $deleteFiles);
         ActivityLogger::log('module_uninstalled', 'module', null, $moduleName . ($deleteFiles ? ' / files deleted' : ''));
-        Session::flash('success', 'Modulis atinstalets.');
+        Session::flash('success', t('modules.uninstall.success'));
         redirect('/modules');
     }
 }

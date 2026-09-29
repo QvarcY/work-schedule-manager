@@ -7,40 +7,40 @@
  */
 ?>
 <section class="panel">
-    <h1>Brivdienu pieteikumi</h1>
-    <p class="muted">Piesaki datumu, kura velies, lai tev neplano mainu. Admins pieteikumu apstiprinas vai noraidis.</p>
+    <h1><?= e(t('day_off.title')) ?></h1>
+    <p class="muted"><?= e(t('day_off.description')) ?></p>
 </section>
 
 <section class="panel request-form-panel">
-    <h2>Jauns pieteikums</h2>
+    <h2><?= e(t('day_off.create.title')) ?></h2>
     <form method="post" action="<?= e(url('/day-off-requests')) ?>">
         <?= csrf_field() ?>
         <div class="day-off-form-grid">
             <div class="form-row">
-                <label>Datums</label>
+                <label><?= e(t('day_off.fields.date')) ?></label>
                 <input name="request_date" type="date" min="<?= e(date('Y-m-d')) ?>" required>
             </div>
             <div class="form-row">
-                <label>Cik svarigi?</label>
+                <label><?= e(t('day_off.fields.importance')) ?></label>
                 <select name="importance">
-                    <option value="velams">Velams</option>
-                    <option value="svarigs">Svarigs</option>
-                    <option value="neatliekams">Neatliekams</option>
+                    <option value="velams"><?= e(t('day_off.importance.preferred')) ?></option>
+                    <option value="svarigs"><?= e(t('day_off.importance.important')) ?></option>
+                    <option value="neatliekams"><?= e(t('day_off.importance.urgent')) ?></option>
                 </select>
             </div>
         </div>
         <div class="form-row">
-            <label>Komentars</label>
-            <textarea name="comment" rows="3" placeholder="Nav obligats"></textarea>
+            <label><?= e(t('common.comment')) ?></label>
+            <textarea name="comment" rows="3" placeholder="<?= e(t('common.optional')) ?>"></textarea>
         </div>
-        <button class="button" type="submit">Nosutit pieteikumu</button>
+        <button class="button" type="submit"><?= e(t('day_off.create.submit')) ?></button>
     </form>
 </section>
 
 <section class="panel">
-    <h2>Mani pieteikumi</h2>
+    <h2><?= e(t('day_off.my_requests')) ?></h2>
     <?php if (empty($requests)): ?>
-        <p>Nav pieteikumu.</p>
+        <p><?= e(t('day_off.empty')) ?></p>
     <?php else: ?>
         <div class="request-list">
             <?php foreach ($requests as $request): ?>
@@ -54,7 +54,7 @@
                         <p><?= e($request['comment']) ?></p>
                     <?php endif; ?>
                     <?php if (!empty($request['admin_comment'])): ?>
-                        <p class="muted">Admina komentars: <?= e($request['admin_comment']) ?></p>
+                        <p class="muted"><?= e(t('day_off.admin_comment', ['comment' => $request['admin_comment']])) ?></p>
                     <?php endif; ?>
                 </article>
             <?php endforeach; ?>
@@ -66,18 +66,18 @@
 function importance_label(string $importance): string
 {
     return [
-        'velams' => 'Velams',
-        'svarigs' => 'Svarigs',
-        'neatliekams' => 'Neatliekams',
+        'velams' => t('day_off.importance.preferred'),
+        'svarigs' => t('day_off.importance.important'),
+        'neatliekams' => t('day_off.importance.urgent'),
     ][$importance] ?? $importance;
 }
 
 function status_label(string $status): string
 {
     return [
-        'pending' => 'Gaida',
-        'approved' => 'Apstiprinats',
-        'rejected' => 'Noraidits',
+        'pending' => t('day_off.status.pending'),
+        'approved' => t('day_off.status.approved'),
+        'rejected' => t('day_off.status.rejected'),
     ][$status] ?? $status;
 }
 ?>
